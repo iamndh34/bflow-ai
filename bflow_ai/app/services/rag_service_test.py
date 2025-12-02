@@ -15,10 +15,8 @@ class HandleJsonFile:
     @staticmethod
     def read(file_name='account_determination_export.json'):
         file_path = os.path.join(APP_DIR, file_name)
-
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File không tồn tại: {file_path}")
-
         with open(file_path, 'r', encoding='utf-8') as f:
             return json.load(f)
 
@@ -28,7 +26,6 @@ _model = SentenceTransformer('bkai-foundation-models/vietnamese-bi-encoder')
 print("Model loaded thành công!")
 
 account_determination = HandleJsonFile.read(file_name='account_determination_export.json')
-
 account_determination_text = [f"{ac['transaction_key']} {ac['foreign_title']} {ac['description']} {ac['type']}" for ac in account_determination]
 account_embedding = _model.encode(account_determination_text, convert_to_numpy=True, show_progress_bar=True)
 account_dimension = account_embedding.shape[1]
@@ -57,7 +54,6 @@ class RagAccounting:
             for r in results:
                 print(r)
             return results[0] if results else None
-
         except Exception as e:
             print("Lỗi RAG:", e)
             return None
@@ -70,11 +66,9 @@ class RagAccounting:
 
         # CHUYỂN DICT → JSON FORMAT (RẤT QUAN TRỌNG)
         context = json.dumps(retrieved_texts, indent=2, ensure_ascii=False)
-
         print("\n===== CONTEXT DÙNG CHO LLM =====")
         print(context)
         print("================================\n")
-
         prompt = f"""
     Bạn là một hệ thống trả lời dựa trên tài liệu kế toán (RAG).  
 **TUYỆT ĐỐI chỉ dùng thông tin có trong JSON dưới đây. Không được bịa, không suy luận ngoài dữ liệu.**
@@ -101,11 +95,9 @@ Yêu cầu:
 
 Bắt đầu trả lời:
     """
-
         response = ollama.generate(
-            model="mistral",
+            model="gemma2:2b",
             prompt=prompt,
             options={'temperature': 0.1}
         )
-
         return response["response"].strip().replace("*", "")
