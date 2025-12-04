@@ -1,0 +1,361 @@
+[
+    {
+        "id": "NV_001",
+        "nghiep_vu": "Mua hàng về nhập kho nhưng chưa có hóa đơn (Hàng về trước hóa đơn về sau)",
+        "mo_ta_chi_tiet": "Trường hợp hàng hóa, nguyên vật liệu đã về nhập kho nhưng đến cuối tháng vẫn chưa nhận được hóa đơn GTGT của nhà cung cấp.",
+        "hach_toan": {
+            "no": [
+                "152 (Nguyên liệu, vật liệu)",
+                "153 (Công cụ, dụng cụ)",
+                "156 (Hàng hóa)"
+            ],
+            "co": [
+                "331 (Phải trả cho người bán)"
+            ],
+            "ghi_chu": "Ghi nhận theo giá tạm tính hoặc giá hợp đồng. Sang tháng sau khi có hóa đơn sẽ điều chỉnh."
+        },
+        "tham_chieu": "Điều 25, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "mua hàng",
+            "nhập kho",
+            "nợ phải trả"
+        ]
+    },
+    {
+        "id": "NV_002",
+        "nghiep_vu": "Thanh toán tiền hàng cho nhà cung cấp bằng chuyển khoản",
+        "mo_ta_chi_tiet": "Chi tiền gửi ngân hàng để trả nợ người bán.",
+        "hach_toan": {
+            "no": [
+                "331 (Phải trả cho người bán)"
+            ],
+            "co": [
+                "112 (Tiền gửi ngân hàng)"
+            ],
+            "ghi_chu": "Cần có ủy nhiệm chi và giấy báo nợ của ngân hàng."
+        },
+        "tham_chieu": "Điều 18, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "thanh toán",
+            "ngân hàng"
+        ]
+    },
+    {
+        "id": "NV_003",
+        "nghiep_vu": "Rút tiền gửi ngân hàng về nhập quỹ tiền mặt",
+        "mo_ta_chi_tiet": "Rút tiền từ tài khoản ngân hàng về nhập quỹ để chi tiêu nội bộ.",
+        "hach_toan": {
+            "no": [
+                "111 (Tiền mặt)"
+            ],
+            "co": [
+                "112 (Tiền gửi ngân hàng)"
+            ],
+            "ghi_chu": "Căn cứ vào Séc rút tiền mặt và Phiếu thu."
+        },
+        "tham_chieu": "Điều 11, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "tiền mặt",
+            "ngân hàng"
+        ]
+    },
+    {
+        "id": "NV_004",
+        "nghiep_vu": "Nộp tiền mặt vào tài khoản ngân hàng",
+        "mo_ta_chi_tiet": "Mang tiền mặt nộp vào tài khoản ngân hàng của công ty.",
+        "hach_toan": {
+            "no": [
+                "112 (Tiền gửi ngân hàng)"
+            ],
+            "co": [
+                "111 (Tiền mặt)"
+            ],
+            "ghi_chu": "Căn cứ vào Giấy nộp tiền và Giấy báo có."
+        },
+        "tham_chieu": "Điều 12, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "tiền mặt",
+            "ngân hàng"
+        ]
+    },
+    {
+        "id": "NV_005",
+        "nghiep_vu": "Bán hàng hóa, thành phẩm ghi nhận doanh thu (bán chịu/chưa thu tiền)",
+        "mo_ta_chi_tiet": "Xuất hàng bán cho khách hàng, đã xuất hóa đơn nhưng khách hàng chưa thanh toán.",
+        "hach_toan": {
+            "no": [
+                "131 (Phải thu của khách hàng)"
+            ],
+            "co": [
+                "511 (Doanh thu bán hàng và cung cấp dịch vụ)",
+                "3331 (Thuế GTGT phải nộp)"
+            ],
+            "ghi_chu": "Phản ánh tổng giá thanh toán phải thu (bao gồm cả thuế GTGT)."
+        },
+        "tham_chieu": "Điều 79, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "bán hàng",
+            "doanh thu",
+            "công nợ"
+        ]
+    },
+    {
+        "id": "NV_006",
+        "nghiep_vu": "Ghi nhận giá vốn hàng bán",
+        "mo_ta_chi_tiet": "Phản ánh trị giá vốn của hàng hóa, thành phẩm đã bán ra trong kỳ.",
+        "hach_toan": {
+            "no": [
+                "632 (Giá vốn hàng bán)"
+            ],
+            "co": [
+                "155 (Thành phẩm)",
+                "156 (Hàng hóa)"
+            ],
+            "ghi_chu": "Ghi nhận đồng thời với bút toán ghi nhận doanh thu."
+        },
+        "tham_chieu": "Điều 87, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "bán hàng",
+            "giá vốn"
+        ]
+    },
+    {
+        "id": "NV_007",
+        "nghiep_vu": "Tạm ứng cho nhân viên đi công tác",
+        "mo_ta_chi_tiet": "Chi tiền mặt tạm ứng cho cán bộ công nhân viên đi công tác hoặc mua sắm vật tư.",
+        "hach_toan": {
+            "no": [
+                "141 (Tạm ứng)"
+            ],
+            "co": [
+                "111 (Tiền mặt)"
+            ],
+            "ghi_chu": "Căn cứ vào Giấy đề nghị tạm ứng và Phiếu chi."
+        },
+        "tham_chieu": "Điều 32, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "tạm ứng",
+            "tiền mặt"
+        ]
+    },
+    {
+        "id": "NV_008",
+        "nghiep_vu": "Thanh toán tạm ứng (Hoàn ứng)",
+        "mo_ta_chi_tiet": "Nhân viên thanh toán số tiền đã tạm ứng sau khi hoàn thành công việc.",
+        "hach_toan": {
+            "no": [
+                "642 (Chi phí quản lý doanh nghiệp)",
+                "133 (Thuế GTGT được khấu trừ)",
+                "111 (Tiền mặt)"
+            ],
+            "co": [
+                "141 (Tạm ứng)"
+            ],
+            "ghi_chu": "Nếu chi quá số tạm ứng thì chi thêm (Có 111). Nếu chi thiếu thì thu lại (Nợ 111)."
+        },
+        "tham_chieu": "Điều 32, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "tạm ứng",
+            "chi phí"
+        ]
+    },
+    {
+        "id": "NV_009",
+        "nghiep_vu": "Tính lương phải trả cho bộ phận quản lý doanh nghiệp",
+        "mo_ta_chi_tiet": "Hạch toán chi phí lương nhân viên văn phòng, quản lý vào chi phí trong kỳ.",
+        "hach_toan": {
+            "no": [
+                "642 (Chi phí quản lý doanh nghiệp)"
+            ],
+            "co": [
+                "334 (Phải trả người lao động)"
+            ],
+            "ghi_chu": "Căn cứ bảng tính lương."
+        },
+        "tham_chieu": "Điều 92, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "lương",
+            "chi phí"
+        ]
+    },
+    {
+        "id": "NV_010",
+        "nghiep_vu": "Trích các khoản bảo hiểm theo lương (Phần doanh nghiệp chịu)",
+        "mo_ta_chi_tiet": "Doanh nghiệp đóng BHXH, BHYT, BHTN, KPCĐ tính vào chi phí.",
+        "hach_toan": {
+            "no": [
+                "642 (Chi phí quản lý doanh nghiệp)"
+            ],
+            "co": [
+                "3383 (Bảo hiểm xã hội)",
+                "3384 (Bảo hiểm y tế)",
+                "3386 (Bảo hiểm thất nghiệp)",
+                "3382 (Kinh phí công đoàn)"
+            ],
+            "ghi_chu": "Tỷ lệ trích theo quy định hiện hành."
+        },
+        "tham_chieu": "Điều 57, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "lương",
+            "bảo hiểm"
+        ]
+    },
+    {
+        "id": "NV_011",
+        "nghiep_vu": "Khấu trừ bảo hiểm vào lương nhân viên (Phần người lao động chịu)",
+        "mo_ta_chi_tiet": "Trừ tiền BHXH, BHYT, BHTN vào lương thực nhận của người lao động.",
+        "hach_toan": {
+            "no": [
+                "334 (Phải trả người lao động)"
+            ],
+            "co": [
+                "3383 (Bảo hiểm xã hội)",
+                "3384 (Bảo hiểm y tế)",
+                "3386 (Bảo hiểm thất nghiệp)"
+            ],
+            "ghi_chu": "Khấu trừ trước khi thanh toán lương."
+        },
+        "tham_chieu": "Điều 53, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "lương",
+            "bảo hiểm"
+        ]
+    },
+    {
+        "id": "NV_012",
+        "nghiep_vu": "Thanh toán lương cho nhân viên bằng chuyển khoản",
+        "mo_ta_chi_tiet": "Chuyển tiền trả lương thực nhận cho nhân viên sau khi đã trừ các khoản khấu trừ.",
+        "hach_toan": {
+            "no": [
+                "334 (Phải trả người lao động)"
+            ],
+            "co": [
+                "112 (Tiền gửi ngân hàng)"
+            ],
+            "ghi_chu": "Căn cứ bảng thanh toán lương."
+        },
+        "tham_chieu": "Điều 53, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "lương",
+            "thanh toán"
+        ]
+    },
+    {
+        "id": "NV_013",
+        "nghiep_vu": "Mua Tài sản cố định (TSCĐ) hữu hình thanh toán ngay bằng chuyển khoản",
+        "mo_ta_chi_tiet": "Mua máy móc, thiết bị, phương tiện vận tải... phục vụ kinh doanh.",
+        "hach_toan": {
+            "no": [
+                "211 (Tài sản cố định hữu hình)",
+                "133 (Thuế GTGT được khấu trừ)"
+            ],
+            "co": [
+                "112 (Tiền gửi ngân hàng)"
+            ],
+            "ghi_chu": "Nguyên giá bao gồm giá mua chưa thuế + chi phí liên quan trực tiếp."
+        },
+        "tham_chieu": "Điều 35, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "tài sản cố định",
+            "mua hàng"
+        ]
+    },
+    {
+        "id": "NV_014",
+        "nghiep_vu": "Trích khấu hao Tài sản cố định dùng cho bộ phận quản lý",
+        "mo_ta_chi_tiet": "Phân bổ giá trị hao mòn của tài sản vào chi phí trong kỳ.",
+        "hach_toan": {
+            "no": [
+                "642 (Chi phí quản lý doanh nghiệp)"
+            ],
+            "co": [
+                "214 (Hao mòn tài sản cố định)"
+            ],
+            "ghi_chu": "Căn cứ bảng phân bổ khấu hao."
+        },
+        "tham_chieu": "Điều 38, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "tài sản cố định",
+            "khấu hao"
+        ]
+    },
+    {
+        "id": "NV_015",
+        "nghiep_vu": "Nộp thuế Giá trị gia tăng (GTGT) vào Ngân sách Nhà nước",
+        "mo_ta_chi_tiet": "Chuyển khoản nộp thuế GTGT đầu ra phải nộp.",
+        "hach_toan": {
+            "no": [
+                "3331 (Thuế GTGT phải nộp)"
+            ],
+            "co": [
+                "112 (Tiền gửi ngân hàng)"
+            ],
+            "ghi_chu": "Căn cứ giấy nộp tiền vào NSNN."
+        },
+        "tham_chieu": "Điều 52, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "thuế",
+            "ngân sách"
+        ]
+    },
+    {
+        "id": "NV_016",
+        "nghiep_vu": "Chi phí điện, nước, viễn thông phải trả (chưa thanh toán)",
+        "mo_ta_chi_tiet": "Nhận hóa đơn điện, nước, internet dùng cho văn phòng nhưng chưa trả tiền.",
+        "hach_toan": {
+            "no": [
+                "642 (Chi phí quản lý doanh nghiệp)",
+                "133 (Thuế GTGT được khấu trừ)"
+            ],
+            "co": [
+                "331 (Phải trả cho người bán)"
+            ],
+            "ghi_chu": "Hạch toán vào chi phí dịch vụ mua ngoài."
+        },
+        "tham_chieu": "Điều 92, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "chi phí",
+            "mua dịch vụ"
+        ]
+    },
+    {
+        "id": "NV_017",
+        "nghiep_vu": "Kết chuyển doanh thu bán hàng cuối kỳ",
+        "mo_ta_chi_tiet": "Cuối kỳ kế toán, kết chuyển doanh thu thuần sang tài khoản xác định kết quả kinh doanh.",
+        "hach_toan": {
+            "no": [
+                "511 (Doanh thu bán hàng và cung cấp dịch vụ)"
+            ],
+            "co": [
+                "911 (Xác định kết quả kinh doanh)"
+            ],
+            "ghi_chu": "Thực hiện cuối tháng/quý/năm."
+        },
+        "tham_chieu": "Điều 96, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "kết chuyển",
+            "cuối kỳ"
+        ]
+    },
+    {
+        "id": "NV_018",
+        "nghiep_vu": "Kết chuyển chi phí giá vốn, quản lý cuối kỳ",
+        "mo_ta_chi_tiet": "Cuối kỳ kế toán, kết chuyển các chi phí sang tài khoản xác định kết quả kinh doanh để tính lãi lỗ.",
+        "hach_toan": {
+            "no": [
+                "911 (Xác định kết quả kinh doanh)"
+            ],
+            "co": [
+                "632 (Giá vốn hàng bán)",
+                "641 (Chi phí bán hàng)",
+                "642 (Chi phí quản lý doanh nghiệp)"
+            ],
+            "ghi_chu": "Thực hiện cuối tháng/quý/năm."
+        },
+        "tham_chieu": "Điều 96, Thông tư 200/2014/TT-BTC",
+        "loai_nghiep_vu": [
+            "kết chuyển",
+            "cuối kỳ"
+        ]
+    }
+]

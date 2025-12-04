@@ -11,27 +11,31 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # /app/services
 
 APP_DIR = os.path.dirname(BASE_DIR)  # /app
 
+
 class HandleJsonFile:
     @staticmethod
-    def read(file_name='account_determination_export.json'):
+    def read(file_name='80785ce8-f138-48b8-b7fa-5fb1971fe204.json'):
         file_path = os.path.join(APP_DIR, file_name)
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File không tồn tại: {file_path}")
         with open(file_path, 'r', encoding='utf-8') as f:
             return json.load(f)
 
+
 # RAG
 print("Đang load model SentenceTransformer...")
 _model = SentenceTransformer('bkai-foundation-models/vietnamese-bi-encoder')
 print("Model loaded thành công!")
 
-account_determination = HandleJsonFile.read(file_name='account_determination_export.json')
-account_determination_text = [f"{ac['transaction_key']} {ac['foreign_title']} {ac['description']} {ac['type']}" for ac in account_determination]
+account_determination = HandleJsonFile.read(file_name='80785ce8-f138-48b8-b7fa-5fb1971fe204.json')
+account_determination_text = [f"{ac['transaction_key']} {ac['foreign_title']} {ac['description']} {ac['type']}" for ac
+                              in account_determination]
 account_embedding = _model.encode(account_determination_text, convert_to_numpy=True, show_progress_bar=True)
 account_dimension = account_embedding.shape[1]
 account_index = faiss.IndexFlatL2(account_dimension)
 account_index.add(account_embedding)
 print("FAISS index đã sẵn sàng cho accounting!")
+
 
 class RagAccounting:
     @staticmethod
