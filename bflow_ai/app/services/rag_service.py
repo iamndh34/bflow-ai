@@ -137,7 +137,7 @@ class RagAccounting:
             Bắt đầu trả lời ngay:
         """
 
-        model = "qwen2.5"  # Hoặc model bạn đang dùng
+        model = "qwen2.5:1.5b"  # Hoặc model bạn đang dùng
 
         # stream=True để nhận từng token
         stream = ollama.generate(
