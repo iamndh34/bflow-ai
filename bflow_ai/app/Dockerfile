@@ -4,14 +4,11 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y gcc curl && rm -rf /var/lib/apt/lists/*
 
-# ✅ copy requirements từ ROOT
 COPY requirements.txt ./requirements.txt
-
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-# ✅ copy toàn bộ source fastapi
-COPY app/ .
+COPY . .
 
 EXPOSE 8010
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8010"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8010"]
