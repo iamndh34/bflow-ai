@@ -1,7 +1,7 @@
 services:
   fastapi:
     build:
-      context: app
+      context: .
       dockerfile: Dockerfile
     container_name: mis_ai
     ports:
