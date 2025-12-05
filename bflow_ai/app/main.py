@@ -23,6 +23,8 @@ app = FastAPI(title="BFLOW AI", lifespan=lifespan)
 origins = [
     "http://127.0.0.1:8001",
     "http://localhost:8001",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
     # Nếu dùng extension, VSCode live server, thêm vào đây
 ]
 
