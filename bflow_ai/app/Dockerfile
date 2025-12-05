@@ -2,15 +2,17 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
+# Cài dependency hệ thống
+RUN apt-get update && apt-get install -y gcc curl && rm -rf /var/lib/apt/lists/*
 
-# ✅ requirements nằm ở ROOT
-COPY ../requirements.txt /app/requirements.txt
+# Copy requirements từ THƯ MỤC CHA
+COPY ../requirements.txt ./requirements.txt
 
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir -r /app/requirements.txt
+# Cài thư viện
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-COPY . /app
+# Copy toàn bộ source code trong thư mục app/
+COPY . .
 
 EXPOSE 8010
 

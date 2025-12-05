@@ -1,12 +1,11 @@
-version: '3.9'
-
 services:
   fastapi:
-    build: .
-    container_name: bflow_fastapi
-    command: uvicorn main:app --host 0.0.0.0 --port 8010 --reload
-    volumes:
-      - .:/app
+    build:
+      context: ..
+      dockerfile: app/Dockerfile
+    container_name: mis_ai
     ports:
       - "8010:8010"
+    env_file:
+      - ../.env
     restart: unless-stopped
