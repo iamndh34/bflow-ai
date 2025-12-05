@@ -6,7 +6,7 @@ services:
     container_name: bflow_fastapi
     command: uvicorn main:app --host 0.0.0.0 --port 8010 --reload
     volumes:
-      - ./app:/app
+      - .:/app
     ports:
       - "8010:8010"
     restart: unless-stopped
