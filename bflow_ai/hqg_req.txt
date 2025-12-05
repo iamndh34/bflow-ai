@@ -39,7 +39,7 @@ sympy==1.12
 pillow==10.3.0
 ollama==0.1.8
 pydantic==1.10.15
-pydantic-settings==2.2.1
+pydantic-settings==0.2.5
 typing_extensions==4.11.0
 sqlparse==0.5.0
 click==8.1.7
