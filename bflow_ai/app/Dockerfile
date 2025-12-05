@@ -2,17 +2,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Cài dependency hệ thống
 RUN apt-get update && apt-get install -y gcc curl && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements từ THƯ MỤC CHA
-COPY ../requirements.txt ./requirements.txt
+# ✅ copy requirements từ ROOT
+COPY requirements.txt ./requirements.txt
 
-# Cài thư viện
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-# Copy toàn bộ source code trong thư mục app/
-COPY . .
+# ✅ copy toàn bộ source fastapi
+COPY app/ .
 
 EXPOSE 8010
 
