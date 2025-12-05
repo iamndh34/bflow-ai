@@ -1,11 +1,11 @@
 services:
   fastapi:
     build:
-      context: .
+      context: app
       dockerfile: Dockerfile
     container_name: mis_ai
     ports:
       - "8010:8010"
     env_file:
-      - ../.env
+      - .env
     restart: unless-stopped
