@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   fastapi:
-    build: app
+    build: .
     container_name: bflow_fastapi
     command: uvicorn main:app --host 0.0.0.0 --port 8010 --reload
     volumes:
