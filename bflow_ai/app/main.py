@@ -31,7 +31,7 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,         # hoặc ["*"] để mở full
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],           # GET, POST, ...
     allow_headers=["*"],           # Cho phép mọi header
 )
