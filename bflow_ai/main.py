@@ -20,20 +20,15 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="BFLOW AI", lifespan=lifespan)
 
 # Cho phép frontend truy cập
-origins = [
-    "http://127.0.0.1:8001",
-    "http://localhost:8001",
-    "http://127.0.0.1:8000",
-    "http://localhost:8000",
-    # Nếu dùng extension, VSCode live server, thêm vào đây
-]
+origin_regex = r"https?://.*:(8000|8001)"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,         # hoặc ["*"] để mở full
-    allow_credentials=False,
-    allow_methods=["*"],           # GET, POST, ...
-    allow_headers=["*"],           # Cho phép mọi header
+    allow_origins=[],        # Để trống
+    allow_origin_regex=origin_regex, # Dùng Regex thay thế
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(router, prefix="/api/v1")
