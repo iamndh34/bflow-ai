@@ -15,8 +15,10 @@ services:
       - mongo
       - ollama  # <--- Đợi cả Ollama chạy xong mới chạy app
     restart: unless-stopped
-    # environment:
-    #   - PYTHONUNBUFFERED=1
+    environment:
+      - MONGO_URL=mongodb://mis_mongo:27017/bflow_db
+      - OLLAMA_HOST=http://mis_ollama:11434  # <--- Dòng này giúp code Python tự biết đường tìm AI
+      - PYTHONUNBUFFERED=1
 
   # 2. Database (Đã có)
   mongo:
