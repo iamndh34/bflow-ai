@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   fastapi:
     build:
@@ -8,4 +10,19 @@ services:
       - "8010:8010"
     env_file:
       - .env
+    depends_on:      # <-- Quan trọng: Đợi mongo chạy trước
+      - mongo
     restart: unless-stopped
+
+  # --- THÊM PHẦN NÀY ---
+  mongo:
+    image: mongo:6.0
+    container_name: mis_mongo  # Đặt tên để dễ gọi
+    restart: always
+    ports:
+      - "27017:27017"          # Mở port để quản lý DB từ bên ngoài (nếu cần)
+    volumes:
+      - mongodb_data:/data/db  # Lưu dữ liệu để không bị mất khi restart
+
+volumes:
+  mongodb_data:
