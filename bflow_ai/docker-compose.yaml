@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # 1. App chính của bạn
   fastapi:
     build:
       context: .
@@ -10,19 +11,34 @@ services:
       - "8010:8010"
     env_file:
       - .env
-    depends_on:      # <-- Quan trọng: Đợi mongo chạy trước
+    depends_on:
       - mongo
+      - ollama  # <--- Đợi cả Ollama chạy xong mới chạy app
     restart: unless-stopped
+    # environment:
+    #   - PYTHONUNBUFFERED=1
 
-  # --- THÊM PHẦN NÀY ---
+  # 2. Database (Đã có)
   mongo:
     image: mongo:6.0
-    container_name: mis_mongo  # Đặt tên để dễ gọi
+    container_name: mis_mongo
     restart: always
     ports:
-      - "27017:27017"          # Mở port để quản lý DB từ bên ngoài (nếu cần)
+      - "27017:27017"
     volumes:
-      - mongodb_data:/data/db  # Lưu dữ liệu để không bị mất khi restart
+      - mongodb_data:/data/db
 
+  # 3. AI Server (THÊM MỚI ĐOẠN NÀY)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: mis_ollama
+    restart: always
+    ports:
+      - "11434:11434" # Mở port này để bạn có thể test từ máy ngoài nếu cần
+    volumes:
+      - ollama_data:/root/.ollama # Quan trọng: Lưu model lại để không phải tải lại mỗi lần restart
+
+# Khai báo Volumes
 volumes:
   mongodb_data:
+  ollama_data: # <--- Thêm dòng này
