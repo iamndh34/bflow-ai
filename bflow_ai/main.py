@@ -19,9 +19,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="BFLOW AI", lifespan=lifespan)
 
-# Cho phép frontend truy cập
-origin_regex = r"https?://.*:(8000|8001)"
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],        # Để trống
@@ -30,7 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router, prefix="/api/v1")
+app.include_router(router, prefix="/api/ai-bflow")
 
 @app.get("/")
 async def root():

@@ -5,15 +5,15 @@ from app.services.rag_service import RagAccounting
 app = FastAPI(title="Accounting AI Assistant")
 router = APIRouter()
 
-@router.get("/ask")
-async def ask_ai(question: str):
+@router.get("/accounting-ask")
+async def accounting_ask(question: str):
     """
     Endpoint RAG Streaming.
     - Input: ?question=...
     - Output: Dòng dữ liệu text (text/plain) trả về liên tục.
     """
     if not question:
-        raise HTTPException(status_code=400, detail="Câu hỏi không được để trống")
+        raise HTTPException(status_code=400, detail="Mình có thể hỗ trợ gì cho bạn? Vui lòng nhập câu hỏi nhé!")
 
     print(f"📩 Nhận câu hỏi: {question}")
 
