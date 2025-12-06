@@ -152,3 +152,6 @@ class RagAccounting:
             content = chunk.get('response', '')
             if content:
                 yield content
+
+        print('Done')
+        
