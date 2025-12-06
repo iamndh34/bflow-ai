@@ -140,7 +140,8 @@ class RagAccounting:
         model = "qwen2.5:1.5b"  # Hoặc model bạn đang dùng
 
         # stream=True để nhận từng token
-        stream = ollama.generate(
+        client = ollama.Client(host='http://mis_ollama:11434')
+        stream = client.generate(
             model=model,
             prompt=prompt,
             options={'temperature': 0.2},
@@ -148,6 +149,6 @@ class RagAccounting:
         )
 
         for chunk in stream:
-            content = chunk['response']
+            content = chunk.get('response', '')
             if content:
                 yield content
