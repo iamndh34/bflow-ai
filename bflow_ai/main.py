@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from motor.motor_asyncio import AsyncIOMotorClient
 from app.core.config import settings
 from app.db.mongodb import db
-from app.api.endpoints import router
+from app.api.endpoints.accounting import router
 from fastapi.middleware.cors import CORSMiddleware
 
 

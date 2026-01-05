@@ -1,0 +1,409 @@
+{
+  "document_types": [
+    {
+      "module_id": 0,
+      "transaction_key": "DO_SALE",
+      "django_model": "delivery.orderdeliverysub",
+      "description": "Phiếu xuất kho bán hàng - ghi nhận giá vốn hàng bán và doanh thu khi giao hàng cho khách hàng",
+      "keywords": [
+        "xuất kho bán", "phiếu xuất kho", "giao hàng cho khách",
+        "giảm tồn kho", "kết chuyển giá vốn", "phiếu giao hàng",
+        "xuất hàng đi bán", "hàng xuất bán", "delivery order"
+      ],
+      "allowed_amount_sources": ["COST", "SALES"]
+    },
+    {
+      "module_id": 0,
+      "transaction_key": "SALES_INVOICE",
+      "django_model": "arinvoice.arinvoice",
+      "description": "Hóa đơn phải thu - ghi nhận công nợ phải thu khách hàng, thuế GTGT đầu ra và đối trừ với phiếu xuất kho",
+      "keywords": [
+        "hóa đơn bán hàng", "hóa đơn đầu ra", "hóa đơn phải thu", "xuất hóa đơn cho khách", "lập hóa đơn bán",
+        "công nợ phải thu", "thuế đầu ra", "VAT đầu ra",
+        "hóa đơn GTGT bán ra", "AR invoice", "ghi nợ khách hàng"
+      ],
+      "allowed_amount_sources": ["TOTAL", "SALES", "TAX", "DISCOUNT", "SURCHARGE", "ROUNDING", "EXPORT_TAX"]
+    },
+    {
+      "module_id": 0,
+      "transaction_key": "CASH_IN",
+      "django_model": "financialcashflow.cashinflow",
+      "description": "Phiếu thu tiền - ghi nhận thu tiền mặt hoặc tiền gửi ngân hàng từ khách hàng, giảm công nợ phải thu",
+      "keywords": [
+        "thu tiền khách hàng", "khách hàng trả tiền", "phiếu thu tiền",
+        "thu hồi công nợ", "nhận thanh toán từ khách", "thu nợ khách",
+        "khách thanh toán", "cash receipt", "tiền về từ khách"
+      ],
+      "allowed_amount_sources": ["TOTAL", "CASH", "BANK"]
+    },
+    {
+      "module_id": 1,
+      "transaction_key": "GRN_PURCHASE",
+      "django_model": "inventory.goodsreceipt",
+      "description": "Phiếu nhập kho mua hàng - ghi nhận tăng hàng tồn kho và phải trả tạm khi nhận hàng từ nhà cung cấp",
+      "keywords": [
+        "nhập kho mua", "phiếu nhập kho", "nhận hàng từ NCC",
+        "tăng tồn kho", "hàng về kho", "nhập hàng mua",
+        "hàng nhập kho", "goods receipt", "GRN"
+      ],
+      "allowed_amount_sources": ["COST"]
+    },
+    {
+      "module_id": 1,
+      "transaction_key": "PURCHASE_INVOICE",
+      "django_model": "apinvoice.apinvoice",
+      "description": "Hóa đơn phải chi - ghi nhận công nợ phải trả nhà cung cấp, thuế GTGT đầu vào và đối trừ với phiếu nhập kho",
+      "keywords": [
+        "hóa đơn mua hàng", "hóa đơn đầu vào", "hóa đơn phải chi", "nhận hóa đơn từ NCC", "hóa đơn nhà cung cấp",
+        "công nợ phải trả", "thuế đầu vào", "VAT đầu vào",
+        "hóa đơn GTGT mua vào", "AP invoice", "ghi nợ nhà cung cấp"
+      ],
+      "allowed_amount_sources": ["TOTAL", "COST", "TAX", "DISCOUNT", "SURCHARGE", "ROUNDING", "IMPORT_TAX"]
+    },
+    {
+      "module_id": 1,
+      "transaction_key": "CASH_OUT",
+      "django_model": "financialcashflow.cashoutflow",
+      "description": "Phiếu chi tiền - ghi nhận chi tiền mặt hoặc chuyển khoản thanh toán cho nhà cung cấp, giảm công nợ phải trả",
+      "keywords": [
+        "chi tiền cho NCC", "trả tiền nhà cung cấp", "phiếu chi tiền",
+        "thanh toán công nợ NCC", "trả nợ nhà cung cấp", "chi trả NCC",
+        "thanh toán cho NCC", "cash payment", "tiền ra cho NCC"
+      ],
+      "allowed_amount_sources": ["TOTAL", "CASH", "BANK"]
+    }
+  ],
+
+  "posting_group_types": {
+    "ITEM_GROUP": "saledata.producttype",
+    "PARTNER_GROUP": "saledata.accounttype"
+  },
+
+  "posting_groups": [
+    { "code": "GOODS", "title": "Hàng hóa", "posting_group_type": "ITEM_GROUP" },
+    { "code": "FINISHED_GOODS", "title": "Thành phẩm", "posting_group_type": "ITEM_GROUP" },
+    { "code": "SEMI_FINISHED", "title": "Bán thành phẩm", "posting_group_type": "ITEM_GROUP" },
+    { "code": "MATERIAL", "title": "Nguyên vật liệu", "posting_group_type": "ITEM_GROUP" },
+    { "code": "TOOL", "title": "Công cụ - Dụng cụ", "posting_group_type": "ITEM_GROUP" },
+    { "code": "SERVICE", "title": "Dịch vụ", "posting_group_type": "ITEM_GROUP" },
+    { "code": "CONSIGNMENT", "title": "Hàng gửi đi bán", "posting_group_type": "ITEM_GROUP" },
+
+    { "code": "CUSTOMER", "title": "Khách hàng", "posting_group_type": "PARTNER_GROUP" },
+    { "code": "SUPPLIER", "title": "Nhà cung cấp", "posting_group_type": "PARTNER_GROUP" },
+    { "code": "PARTNER_OTHER", "title": "Đối tác khác", "posting_group_type": "PARTNER_GROUP" }
+  ],
+
+  "role_keys": {
+    "ASSET": "Tài sản",
+    "COGS": "Giá vốn",
+    "REVENUE": "Doanh thu",
+    "DONI": "Phải thu tạm",
+    "GRNI": "Phải trả tạm",
+    "RECEIVABLE": "Phải thu",
+    "PAYABLE": "Phải trả",
+    "TAX_OUT": "Thuế đầu ra",
+    "TAX_IN": "Thuế đầu vào",
+    "CASH": "Tiền mặt",
+    "BANK": "Tiền gửi",
+    "SALES_DEDUCTION": "Giảm trừ doanh thu",
+    "TAX_EXPORT": "Thuế xuất khẩu",
+    "TAX_IMPORT": "Thuế nhập khẩu",
+    "OTHER_EXPENSE": "Chi phí khác"
+  },
+
+  "gl_mapping": {
+    "GOODS": {
+      "ASSET": "1561",
+      "COGS": "632",
+      "REVENUE": "5111",
+      "DONI": "13881",
+      "GRNI": "33881"
+    },
+    "FINISHED_GOODS": {
+      "ASSET": "155",
+      "COGS": "632",
+      "REVENUE": "5112",
+      "DONI": "13881",
+      "GRNI": "33881"
+    },
+    "SEMI_FINISHED": {
+      "ASSET": "154",
+      "COGS": "632",
+      "REVENUE": "5112",
+      "DONI": "13881",
+      "GRNI": "33881"
+    },
+    "MATERIAL": {
+      "ASSET": "152",
+      "COGS": "632",
+      "REVENUE": "5111",
+      "DONI": "13881",
+      "GRNI": "33881"
+    },
+    "TOOL": {
+      "ASSET": "153",
+      "COGS": "632",
+      "REVENUE": "5111",
+      "DONI": "13881",
+      "GRNI": "33881"
+    },
+    "SERVICE": {
+      "ASSET": null,
+      "COGS": "632",
+      "REVENUE": "5113",
+      "DONI": "13881",
+      "GRNI": "33881"
+    },
+    "CONSIGNMENT": {
+      "ASSET": "157",
+      "COGS": "632",
+      "REVENUE": "5111",
+      "DONI": "13881",
+      "GRNI": "33881"
+    },
+
+    "CUSTOMER": {
+      "RECEIVABLE": "131",
+      "TAX_OUT": "33311",
+      "CASH": "1111",
+      "BANK": "1121"
+    },
+    "SUPPLIER": {
+      "PAYABLE": "331",
+      "TAX_IN": "1331",
+      "CASH": "1111",
+      "BANK": "1121"
+    },
+    "PARTNER_OTHER": {
+      "RECEIVABLE": "1388",
+      "PAYABLE": "3388",
+      "TAX_OUT": "33311",
+      "CASH": "1111",
+      "BANK": "1121"
+    }
+  },
+
+  "posting_rules": [
+    {
+      "je_doc_type": "DO_SALE",
+      "rules": [
+        {
+          "rule_level": "LINE",
+          "priority": 10,
+          "role_key": "COGS",
+          "side": "DEBIT",
+          "amount_source": "COST",
+          "account_source_type": "LOOKUP",
+          "description": "Giá vốn hàng bán"
+        },
+        {
+          "rule_level": "LINE",
+          "priority": 20,
+          "role_key": "ASSET",
+          "side": "CREDIT",
+          "amount_source": "COST",
+          "account_source_type": "LOOKUP",
+          "description": "Giảm kho hàng hóa"
+        },
+        {
+          "rule_level": "LINE",
+          "priority": 30,
+          "role_key": "DONI",
+          "side": "DEBIT",
+          "amount_source": "SALES",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "13881",
+          "description": "Phải thu tạm tính (13881)"
+        },
+        {
+          "rule_level": "LINE",
+          "priority": 40,
+          "role_key": "REVENUE",
+          "side": "CREDIT",
+          "amount_source": "SALES",
+          "account_source_type": "LOOKUP",
+          "description": "Doanh thu bán hàng"
+        }
+      ]
+    },
+
+    {
+      "je_doc_type": "SALES_INVOICE",
+      "rules": [
+        {
+          "rule_level": "HEADER",
+          "priority": 10,
+          "role_key": "RECEIVABLE",
+          "side": "DEBIT",
+          "amount_source": "TOTAL",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "131",
+          "description": "Phải thu khách hàng (131)"
+        },
+        {
+          "rule_level": "HEADER",
+          "priority": 20,
+          "role_key": "TAX_OUT",
+          "side": "CREDIT",
+          "amount_source": "TAX",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "33311",
+          "description": "Thuế GTGT đầu ra (33311)"
+        },
+        {
+          "rule_level": "LINE",
+          "priority": 30,
+          "role_key": "DONI",
+          "side": "CREDIT",
+          "amount_source": "SALES",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "13881",
+          "description": "Đối trừ hàng đã xuất (13881)"
+        },
+        {
+          "rule_level": "LINE",
+          "priority": 40,
+          "role_key": "SALES_DEDUCTION",
+          "side": "DEBIT",
+          "amount_source": "DISCOUNT",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "5211",
+          "description": "Chiết khấu thương mại theo dòng"
+        }
+      ]
+    },
+
+    {
+      "je_doc_type": "GRN_PURCHASE",
+      "rules": [
+        {
+          "rule_level": "LINE",
+          "priority": 10,
+          "role_key": "ASSET",
+          "side": "DEBIT",
+          "amount_source": "COST",
+          "account_source_type": "LOOKUP",
+          "description": "Nhập kho hàng hóa"
+        },
+        {
+          "rule_level": "LINE",
+          "priority": 20,
+          "role_key": "GRNI",
+          "side": "CREDIT",
+          "amount_source": "COST",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "33881",
+          "description": "Phải trả tạm tính (33881)"
+        }
+      ]
+    },
+
+    {
+      "je_doc_type": "PURCHASE_INVOICE",
+      "rules": [
+        {
+          "rule_level": "HEADER",
+          "priority": 10,
+          "role_key": "PAYABLE",
+          "side": "CREDIT",
+          "amount_source": "TOTAL",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "331",
+          "description": "Phải trả người bán"
+        },
+        {
+          "rule_level": "HEADER",
+          "priority": 20,
+          "role_key": "TAX_IN",
+          "side": "DEBIT",
+          "amount_source": "TAX",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "1331",
+          "description": "Thuế GTGT đầu vào"
+        },
+        {
+          "rule_level": "LINE",
+          "priority": 30,
+          "role_key": "GRNI",
+          "side": "DEBIT",
+          "amount_source": "COST",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "33881",
+          "description": "Đối trừ hàng về chưa hóa đơn"
+        }
+      ]
+    },
+
+    {
+      "je_doc_type": "CASH_OUT",
+      "rules": [
+        {
+          "rule_level": "HEADER",
+          "priority": 10,
+          "role_key": "PAYABLE",
+          "side": "DEBIT",
+          "amount_source": "TOTAL",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "331",
+          "description": "Giảm nợ phải trả NCC"
+        },
+        {
+          "rule_level": "HEADER",
+          "priority": 20,
+          "role_key": "CASH",
+          "side": "CREDIT",
+          "amount_source": "CASH",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "1111",
+          "description": "Chi tiền mặt"
+        },
+        {
+          "rule_level": "HEADER",
+          "priority": 30,
+          "role_key": "BANK",
+          "side": "CREDIT",
+          "amount_source": "BANK",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "1121",
+          "description": "Chi tiền gửi ngân hàng"
+        }
+      ]
+    },
+
+    {
+      "je_doc_type": "CASH_IN",
+      "rules": [
+        {
+          "rule_level": "HEADER",
+          "priority": 10,
+          "role_key": "CASH",
+          "side": "DEBIT",
+          "amount_source": "CASH",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "1111",
+          "description": "Thu tiền mặt"
+        },
+        {
+          "rule_level": "HEADER",
+          "priority": 20,
+          "role_key": "BANK",
+          "side": "DEBIT",
+          "amount_source": "BANK",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "1121",
+          "description": "Thu tiền gửi ngân hàng"
+        },
+        {
+          "rule_level": "HEADER",
+          "priority": 30,
+          "role_key": "RECEIVABLE",
+          "side": "CREDIT",
+          "amount_source": "TOTAL",
+          "account_source_type": "FIXED",
+          "fixed_account_code": "131",
+          "description": "Thu tiền khách hàng"
+        }
+      ]
+    }
+  ]
+}
