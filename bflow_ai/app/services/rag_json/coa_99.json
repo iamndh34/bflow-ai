@@ -3,16 +3,16 @@
     "standard": "TT99",
     "code": "111",
     "name": "Tiền mặt",
-    "name_en": "Cash on hand",
+    "name_en": "Cash in hand",
     "type_id": 1,
     "type_name": "Tài sản",
-    "search_text": "111 - Tiền mặt (Cash on hand)"
+    "search_text": "111 - Tiền mặt (Cash in hand)"
   },
   {
     "standard": "TT99",
     "code": "112",
     "name": "Tiền gửi không kỳ hạn",
-    "name_en": "Cash in bank (Demand deposits)",
+    "name_en": "Cash in bank",
     "type_id": 1,
     "type_name": "Tài sản",
     "search_text": "112 - Tiền gửi không kỳ hạn (Cash in bank)"
@@ -30,10 +30,10 @@
     "standard": "TT99",
     "code": "121",
     "name": "Chứng khoán kinh doanh",
-    "name_en": "Trading securities",
+    "name_en": "Securities trading",
     "type_id": 1,
     "type_name": "Tài sản",
-    "search_text": "121 - Chứng khoán kinh doanh (Trading securities)"
+    "search_text": "121 - Chứng khoán kinh doanh (Securities trading)"
   },
   {
     "standard": "TT99",
@@ -57,19 +57,37 @@
     "standard": "TT99",
     "code": "133",
     "name": "Thuế GTGT được khấu trừ",
-    "name_en": "Deductible VAT",
+    "name_en": "VAT deducted",
     "type_id": 1,
     "type_name": "Tài sản",
-    "search_text": "133 - Thuế GTGT được khấu trừ (Deductible VAT)"
+    "search_text": "133 - Thuế GTGT được khấu trừ (VAT deducted)"
+  },
+  {
+    "standard": "TT99",
+    "code": "1331",
+    "name": "Thuế GTGT được khấu trừ của HH, DV",
+    "name_en": "VAT deduction of goods, services",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "1331 - Thuế GTGT được khấu trừ của HH, DV (VAT deduction of goods, services)"
+  },
+  {
+    "standard": "TT99",
+    "code": "1332",
+    "name": "Thuế GTGT được khấu trừ của TSCĐ",
+    "name_en": "VAT deduction of fixed assets",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "1332 - Thuế GTGT được khấu trừ của TSCĐ (VAT deduction of fixed assets)"
   },
   {
     "standard": "TT99",
     "code": "136",
     "name": "Phải thu nội bộ",
-    "name_en": "Internal receivables",
+    "name_en": "Intercompany receivable",
     "type_id": 1,
     "type_name": "Tài sản",
-    "search_text": "136 - Phải thu nội bộ (Internal receivables)"
+    "search_text": "136 - Phải thu nội bộ (Intercompany receivable)"
   },
   {
     "standard": "TT99",
@@ -82,12 +100,21 @@
   },
   {
     "standard": "TT99",
-    "code": "1383",
-    "name": "Thuế TTĐB của hàng nhập khẩu",
-    "name_en": "Excise tax on imports",
+    "code": "1381",
+    "name": "Tài sản thiếu chờ xử lý",
+    "name_en": "Shortage of assets awaiting resolution",
     "type_id": 1,
     "type_name": "Tài sản",
-    "search_text": "1383 - Thuế TTĐB của hàng nhập khẩu (Excise tax on imports)"
+    "search_text": "1381 - Tài sản thiếu chờ xử lý (Shortage of assets awaiting resolution)"
+  },
+  {
+    "standard": "TT99",
+    "code": "1388",
+    "name": "Phải thu khác",
+    "name_en": "Other receivables",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "1388 - Phải thu khác (Other receivables)"
   },
   {
     "standard": "TT99",
@@ -163,21 +190,12 @@
   },
   {
     "standard": "TT99",
-    "code": "158",
-    "name": "Nguyên liệu, vật tư tại kho bảo thuế",
-    "name_en": "Goods in bonded warehouse",
-    "type_id": 1,
-    "type_name": "Tài sản",
-    "search_text": "158 - Nguyên liệu, vật tư tại kho bảo thuế"
-  },
-  {
-    "standard": "TT99",
     "code": "171",
     "name": "Giao dịch mua, bán lại trái phiếu chính phủ",
     "name_en": "Government bond repurchase agreements",
     "type_id": 1,
     "type_name": "Tài sản",
-    "search_text": "171 - Giao dịch mua, bán lại trái phiếu chính phủ"
+    "search_text": "171 - Giao dịch mua, bán lại trái phiếu chính phủ (Government bond repurchase agreements)"
   },
   {
     "standard": "TT99",
@@ -187,24 +205,6 @@
     "type_id": 1,
     "type_name": "Tài sản",
     "search_text": "211 - Tài sản cố định hữu hình (Tangible fixed assets)"
-  },
-  {
-    "standard": "TT99",
-    "code": "212",
-    "name": "Tài sản cố định thuê tài chính",
-    "name_en": "Finance lease fixed assets",
-    "type_id": 1,
-    "type_name": "Tài sản",
-    "search_text": "212 - Tài sản cố định thuê tài chính (Finance lease fixed assets)"
-  },
-  {
-    "standard": "TT99",
-    "code": "213",
-    "name": "Tài sản cố định vô hình",
-    "name_en": "Intangible fixed assets",
-    "type_id": 1,
-    "type_name": "Tài sản",
-    "search_text": "213 - Tài sản cố định vô hình (Intangible fixed assets)"
   },
   {
     "standard": "TT99",
@@ -226,42 +226,6 @@
   },
   {
     "standard": "TT99",
-    "code": "217",
-    "name": "Bất động sản đầu tư",
-    "name_en": "Investment property",
-    "type_id": 1,
-    "type_name": "Tài sản",
-    "search_text": "217 - Bất động sản đầu tư (Investment property)"
-  },
-  {
-    "standard": "TT99",
-    "code": "221",
-    "name": "Đầu tư vào công ty con",
-    "name_en": "Investment in subsidiaries",
-    "type_id": 1,
-    "type_name": "Tài sản",
-    "search_text": "221 - Đầu tư vào công ty con (Investment in subsidiaries)"
-  },
-  {
-    "standard": "TT99",
-    "code": "222",
-    "name": "Đầu tư vào công ty liên doanh, liên kết",
-    "name_en": "Investment in associates and joint ventures",
-    "type_id": 1,
-    "type_name": "Tài sản",
-    "search_text": "222 - Đầu tư vào công ty liên doanh, liên kết"
-  },
-  {
-    "standard": "TT99",
-    "code": "228",
-    "name": "Đầu tư khác",
-    "name_en": "Other investments",
-    "type_id": 1,
-    "type_name": "Tài sản",
-    "search_text": "228 - Đầu tư khác (Other investments)"
-  },
-  {
-    "standard": "TT99",
     "code": "229",
     "name": "Dự phòng tổn thất tài sản",
     "name_en": "Provision for asset loss",
@@ -276,7 +240,7 @@
     "name_en": "Provision for biological assets",
     "type_id": 1,
     "type_name": "Tài sản",
-    "search_text": "2295 - Dự phòng tổn thất tài sản sinh học"
+    "search_text": "2295 - Dự phòng tổn thất tài sản sinh học (Provision for biological assets)"
   },
   {
     "standard": "TT99",
@@ -298,15 +262,6 @@
   },
   {
     "standard": "TT99",
-    "code": "243",
-    "name": "Tài sản thuế thu nhập hoãn lại",
-    "name_en": "Deferred tax assets",
-    "type_id": 1,
-    "type_name": "Tài sản",
-    "search_text": "243 - Tài sản thuế thu nhập hoãn lại (Deferred tax assets)"
-  },
-  {
-    "standard": "TT99",
     "code": "331",
     "name": "Phải trả cho người bán",
     "name_en": "Payable to suppliers",
@@ -318,19 +273,46 @@
     "standard": "TT99",
     "code": "332",
     "name": "Phải trả cổ tức, lợi nhuận",
-    "name_en": "Dividends and profits payable",
+    "name_en": "Payable dividends, profits",
     "type_id": 2,
     "type_name": "Nợ phải trả",
-    "search_text": "332 - Phải trả cổ tức, lợi nhuận"
+    "search_text": "332 - Phải trả cổ tức, lợi nhuận (Payable dividends, profits)"
   },
   {
     "standard": "TT99",
     "code": "333",
     "name": "Thuế và các khoản phải nộp Nhà nước",
-    "name_en": "Taxes and other payables to the State",
+    "name_en": "Taxes and statutorily obligations",
     "type_id": 2,
     "type_name": "Nợ phải trả",
-    "search_text": "333 - Thuế và các khoản phải nộp Nhà nước"
+    "search_text": "333 - Thuế và các khoản phải nộp Nhà nước (Taxes and statutorily obligations)"
+  },
+  {
+    "standard": "TT99",
+    "code": "3331",
+    "name": "Thuế GTGT phải nộp",
+    "name_en": "VAT payable",
+    "type_id": 2,
+    "type_name": "Nợ phải trả",
+    "search_text": "3331 - Thuế GTGT phải nộp (VAT payable)"
+  },
+  {
+    "standard": "TT99",
+    "code": "33311",
+    "name": "Thuế GTGT đầu ra",
+    "name_en": "VAT output",
+    "type_id": 2,
+    "type_name": "Nợ phải trả",
+    "search_text": "33311 - Thuế GTGT đầu ra (VAT output)"
+  },
+  {
+    "standard": "TT99",
+    "code": "33312",
+    "name": "Thuế GTGT hàng nhập khẩu",
+    "name_en": "VAT on imports",
+    "type_id": 2,
+    "type_name": "Nợ phải trả",
+    "search_text": "33312 - Thuế GTGT hàng nhập khẩu (VAT on imports)"
   },
   {
     "standard": "TT99",
@@ -366,7 +348,7 @@
     "name_en": "Construction contract progress payments",
     "type_id": 2,
     "type_name": "Nợ phải trả",
-    "search_text": "337 - Thanh toán theo tiến độ hợp đồng xây dựng"
+    "search_text": "337 - Thanh toán theo tiến độ hợp đồng xây dựng (Construction contract progress payments)"
   },
   {
     "standard": "TT99",
@@ -379,21 +361,30 @@
   },
   {
     "standard": "TT99",
+    "code": "3388",
+    "name": "Phải trả, phải nộp khác",
+    "name_en": "Other payables",
+    "type_id": 2,
+    "type_name": "Nợ phải trả",
+    "search_text": "3388 - Phải trả, phải nộp khác (Other payables)"
+  },
+  {
+    "standard": "TT99",
     "code": "341",
     "name": "Vay và nợ thuê tài chính",
     "name_en": "Borrowings and finance lease liabilities",
     "type_id": 2,
     "type_name": "Nợ phải trả",
-    "search_text": "341 - Vay và nợ thuê tài chính"
+    "search_text": "341 - Vay và nợ thuê tài chính (Borrowings and finance lease liabilities)"
   },
   {
     "standard": "TT99",
     "code": "343",
     "name": "Trái phiếu phát hành",
-    "name_en": "Issued bonds",
+    "name_en": "Bonds issued",
     "type_id": 2,
     "type_name": "Nợ phải trả",
-    "search_text": "343 - Trái phiếu phát hành (Issued bonds)"
+    "search_text": "343 - Trái phiếu phát hành (Bonds issued)"
   },
   {
     "standard": "TT99",
@@ -411,7 +402,7 @@
     "name_en": "Provisions for payables",
     "type_id": 2,
     "type_name": "Nợ phải trả",
-    "search_text": "352 - Dự phòng phải trả (Provisions)"
+    "search_text": "352 - Dự phòng phải trả (Provisions for payables)"
   },
   {
     "standard": "TT99",
@@ -420,16 +411,16 @@
     "name_en": "Bonus and welfare fund",
     "type_id": 2,
     "type_name": "Nợ phải trả",
-    "search_text": "353 - Quỹ khen thưởng, phúc lợi"
+    "search_text": "353 - Quỹ khen thưởng, phúc lợi (Bonus and welfare fund)"
   },
   {
     "standard": "TT99",
     "code": "356",
-    "name": "Quỹ phát triển khoa học và công nghệ",
-    "name_en": "Science and technology development fund",
+    "name": "Quỹ phát triển KH&CN",
+    "name_en": "Science and Technology Development Fund",
     "type_id": 2,
     "type_name": "Nợ phải trả",
-    "search_text": "356 - Quỹ phát triển khoa học và công nghệ"
+    "search_text": "356 - Quỹ phát triển KH&CN (Science and Technology Development Fund)"
   },
   {
     "standard": "TT99",
@@ -447,7 +438,7 @@
     "name_en": "Asset revaluation differences",
     "type_id": 3,
     "type_name": "Vốn chủ sở hữu",
-    "search_text": "412 - Chênh lệch đánh giá lại tài sản"
+    "search_text": "412 - Chênh lệch đánh giá lại tài sản (Asset revaluation differences)"
   },
   {
     "standard": "TT99",
@@ -456,7 +447,7 @@
     "name_en": "Foreign exchange differences",
     "type_id": 3,
     "type_name": "Vốn chủ sở hữu",
-    "search_text": "413 - Chênh lệch tỷ giá hối đoái"
+    "search_text": "413 - Chênh lệch tỷ giá hối đoái (Foreign exchange differences)"
   },
   {
     "standard": "TT99",
@@ -465,16 +456,16 @@
     "name_en": "Investment and development fund",
     "type_id": 3,
     "type_name": "Vốn chủ sở hữu",
-    "search_text": "414 - Quỹ đầu tư phát triển"
+    "search_text": "414 - Quỹ đầu tư phát triển (Investment and development fund)"
   },
   {
     "standard": "TT99",
     "code": "418",
     "name": "Các quỹ khác thuộc vốn chủ sở hữu",
-    "name_en": "Other funds",
+    "name_en": "Other funds in equity",
     "type_id": 3,
     "type_name": "Vốn chủ sở hữu",
-    "search_text": "418 - Các quỹ khác thuộc vốn chủ sở hữu"
+    "search_text": "418 - Các quỹ khác thuộc vốn chủ sở hữu (Other funds in equity)"
   },
   {
     "standard": "TT99",
@@ -489,10 +480,10 @@
     "standard": "TT99",
     "code": "421",
     "name": "Lợi nhuận sau thuế chưa phân phối",
-    "name_en": "Undistributed earnings",
+    "name_en": "Undistributed profit after tax",
     "type_id": 3,
     "type_name": "Vốn chủ sở hữu",
-    "search_text": "421 - Lợi nhuận sau thuế chưa phân phối (Undistributed earnings)"
+    "search_text": "421 - Lợi nhuận sau thuế chưa phân phối (Undistributed profit after tax)"
   },
   {
     "standard": "TT99",
@@ -501,7 +492,7 @@
     "name_en": "Revenue from sales and services",
     "type_id": 4,
     "type_name": "Doanh thu",
-    "search_text": "511 - Doanh thu bán hàng và cung cấp dịch vụ"
+    "search_text": "511 - Doanh thu bán hàng và cung cấp dịch vụ (Revenue from sales and services)"
   },
   {
     "standard": "TT99",
@@ -510,7 +501,7 @@
     "name_en": "Financial income",
     "type_id": 4,
     "type_name": "Doanh thu",
-    "search_text": "515 - Doanh thu hoạt động tài chính"
+    "search_text": "515 - Doanh thu hoạt động tài chính (Financial income)"
   },
   {
     "standard": "TT99",
@@ -525,37 +516,28 @@
     "standard": "TT99",
     "code": "621",
     "name": "Chi phí nguyên liệu, vật liệu trực tiếp",
-    "name_en": "Direct raw materials cost",
+    "name_en": "Direct material costs",
     "type_id": 5,
     "type_name": "Chi phí SXKD",
-    "search_text": "621 - Chi phí nguyên liệu, vật liệu trực tiếp"
+    "search_text": "621 - Chi phí nguyên liệu, vật liệu trực tiếp (Direct material costs)"
   },
   {
     "standard": "TT99",
     "code": "622",
     "name": "Chi phí nhân công trực tiếp",
-    "name_en": "Direct labor cost",
+    "name_en": "Direct labor costs",
     "type_id": 5,
     "type_name": "Chi phí SXKD",
-    "search_text": "622 - Chi phí nhân công trực tiếp"
-  },
-  {
-    "standard": "TT99",
-    "code": "623",
-    "name": "Chi phí sử dụng máy thi công",
-    "name_en": "Construction machine cost",
-    "type_id": 5,
-    "type_name": "Chi phí SXKD",
-    "search_text": "623 - Chi phí sử dụng máy thi công"
+    "search_text": "622 - Chi phí nhân công trực tiếp (Direct labor costs)"
   },
   {
     "standard": "TT99",
     "code": "627",
     "name": "Chi phí sản xuất chung",
-    "name_en": "Manufacturing overheads",
+    "name_en": "Manufacturing overhead costs",
     "type_id": 5,
     "type_name": "Chi phí SXKD",
-    "search_text": "627 - Chi phí sản xuất chung"
+    "search_text": "627 - Chi phí sản xuất chung (Manufacturing overhead costs)"
   },
   {
     "standard": "TT99",
@@ -564,7 +546,7 @@
     "name_en": "Cost of goods sold",
     "type_id": 5,
     "type_name": "Chi phí SXKD",
-    "search_text": "632 - Giá vốn hàng bán (COGS)"
+    "search_text": "632 - Giá vốn hàng bán (Cost of goods sold)"
   },
   {
     "standard": "TT99",
@@ -573,7 +555,7 @@
     "name_en": "Financial expenses",
     "type_id": 5,
     "type_name": "Chi phí SXKD",
-    "search_text": "635 - Chi phí tài chính"
+    "search_text": "635 - Chi phí tài chính (Financial expenses)"
   },
   {
     "standard": "TT99",
@@ -582,16 +564,16 @@
     "name_en": "Selling expenses",
     "type_id": 5,
     "type_name": "Chi phí SXKD",
-    "search_text": "641 - Chi phí bán hàng"
+    "search_text": "641 - Chi phí bán hàng (Selling expenses)"
   },
   {
     "standard": "TT99",
     "code": "642",
     "name": "Chi phí quản lý doanh nghiệp",
-    "name_en": "General and administration expenses",
+    "name_en": "General administration expenses",
     "type_id": 5,
     "type_name": "Chi phí SXKD",
-    "search_text": "642 - Chi phí quản lý doanh nghiệp (G&A)"
+    "search_text": "642 - Chi phí quản lý doanh nghiệp (General administration expenses)"
   },
   {
     "standard": "TT99",
@@ -600,7 +582,7 @@
     "name_en": "Other income",
     "type_id": 6,
     "type_name": "Thu nhập khác",
-    "search_text": "711 - Thu nhập khác"
+    "search_text": "711 - Thu nhập khác (Other income)"
   },
   {
     "standard": "TT99",
@@ -609,25 +591,25 @@
     "name_en": "Other expenses",
     "type_id": 7,
     "type_name": "Chi phí khác",
-    "search_text": "811 - Chi phí khác"
+    "search_text": "811 - Chi phí khác (Other expenses)"
   },
   {
     "standard": "TT99",
     "code": "821",
     "name": "Chi phí thuế thu nhập doanh nghiệp",
-    "name_en": "Corporate income tax expense",
+    "name_en": "Corporate income tax expenses",
     "type_id": 7,
     "type_name": "Chi phí khác",
-    "search_text": "821 - Chi phí thuế thu nhập doanh nghiệp"
+    "search_text": "821 - Chi phí thuế thu nhập doanh nghiệp (Corporate income tax expenses)"
   },
   {
     "standard": "TT99",
     "code": "82112",
     "name": "Chi phí thuế TNDN bổ sung (Thuế tối thiểu toàn cầu)",
-    "name_en": "Top-up Corporate Income Tax",
+    "name_en": "Top-up CIT (Global Minimum Tax)",
     "type_id": 7,
     "type_name": "Chi phí khác",
-    "search_text": "82112 - Chi phí thuế TNDN bổ sung (Thuế tối thiểu toàn cầu)"
+    "search_text": "82112 - Chi phí thuế TNDN bổ sung (Thuế tối thiểu toàn cầu) (Top-up CIT (Global Minimum Tax))"
   },
   {
     "standard": "TT99",
@@ -636,6 +618,6 @@
     "name_en": "Income summary",
     "type_id": 8,
     "type_name": "Xác định kết quả",
-    "search_text": "911 - Xác định kết quả kinh doanh"
+    "search_text": "911 - Xác định kết quả kinh doanh (Income summary)"
   }
 ]

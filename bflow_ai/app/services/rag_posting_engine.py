@@ -34,42 +34,33 @@ ROLE_KEYS = CONFIG["role_keys"]
 # CONSTANTS & DEFINITIONS
 # =============================================================================
 
-ACCOUNT_NAMES = {
-    "111": "Tiền mặt",
-    "112": "Tiền gửi không kỳ hạn",
-    "131": "Phải thu của khách hàng",
+# Load ACCOUNT_NAMES từ coa_99.json
+COA_99_FILE = os.path.join(BASE_DIR, "services", "rag_json", "coa_99.json")
+ACCOUNT_NAMES = {}
+
+if os.path.exists(COA_99_FILE):
+    with open(COA_99_FILE, "r", encoding="utf-8") as f:
+        coa_data = json.load(f)
+        ACCOUNT_NAMES = {item["code"]: item["name"] for item in coa_data}
+
+# Bổ sung các TK con/đặc biệt không có trong COA
+ACCOUNT_NAMES.update({
     "1331": "Thuế GTGT được khấu trừ",
     "1388": "Phải thu khác",
     "13881": "Phải thu tạm (Giao hàng chưa xuất HĐ)",
-    "152": "Nguyên liệu, vật liệu",
-    "153": "Công cụ, dụng cụ",
-    "154": "Chi phí SXKD dở dang",
-    "155": "Sản phẩm",
-    "156": "Hàng hóa",
-    "157": "Hàng gửi đi bán",
-    "211": "Tài sản cố định hữu hình",
-    "215": "Tài sản sinh học",
-    "331": "Phải trả cho người bán",
     "33311": "Thuế GTGT đầu ra",
     "3388": "Phải trả, phải nộp khác",
     "33881": "Phải trả tạm (Nhập hàng chưa có HĐ)",
-    "511": "Doanh thu bán hàng và cung cấp dịch vụ",
-    "521": "Các khoản giảm trừ doanh thu",
-    "632": "Giá vốn hàng bán",
-    "641": "Chi phí bán hàng",
-    "642": "Chi phí quản lý doanh nghiệp",
-    "811": "Chi phí khác",
-    "82112": "Chi phí thuế TNDN bổ sung (Thuế tối thiểu toàn cầu)",
-}
+})
 
-TRANSACTION_NAMES = {
-    "DO_SALE": "Phiếu xuất kho bán hàng",
-    "SALES_INVOICE": "Hóa đơn phải thu",
-    "CASH_IN": "Phiếu thu tiền",
-    "GRN_PURCHASE": "Phiếu nhập kho mua hàng",
-    "PURCHASE_INVOICE": "Hóa đơn phải chi",
-    "CASH_OUT": "Phiếu chi tiền",
-}
+# Load TRANSACTION_NAMES từ posting_engine.json (trích từ description)
+TRANSACTION_NAMES = {}
+for doc in CONFIG.get("document_types", []):
+    tx_key = doc.get("transaction_key")
+    desc = doc.get("description", "")
+    # Format: "Tên nghiệp vụ - mô tả chi tiết" -> lấy phần trước " - "
+    name = desc.split(" - ")[0] if " - " in desc else desc
+    TRANSACTION_NAMES[tx_key] = name
 
 # =============================================================================
 # SLM TRANSACTION CLASSIFICATION
