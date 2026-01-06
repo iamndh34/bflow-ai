@@ -8,6 +8,8 @@ import networkx as nx
 import ollama
 from sentence_transformers import SentenceTransformer
 
+from app.core.config import settings
+
 # =============================================================================
 # CONFIG
 # =============================================================================
@@ -830,7 +832,8 @@ Trả lời theo định dạng:
         # Stream response from SLM
         slm_output = ""
         try:
-            stream = ollama.chat(
+            client = ollama.Client(host=settings.OLLAMA_HOST)
+            stream = client.chat(
                 model="qwen2.5:3b",
                 messages=[
                     {"role": "system", "content": system_prompt},
