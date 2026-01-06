@@ -74,23 +74,26 @@ FEW_SHOT_QA = """
 Phiếu xuất kho bán hàng
 
 2. BẢNG BÚT TOÁN:
-- Nợ TK 632: Giá vốn hàng bán
-- Có TK 1561: Hàng hóa
+- Nợ TK 632: Giá vốn hàng bán (*)
+- Có TK 1561: Hàng hóa (*)
 - Nợ TK 13881: Phải thu tạm
-- Có TK 5111: Doanh thu bán hàng hóa
+- Có TK 5111: Doanh thu bán hàng hóa (*)
 
 3. GIẢI THÍCH:
-- Nợ TK 632: Khi xuất kho bán hàng, doanh nghiệp ghi nhận chi phí giá vốn hàng bán
-- Có TK 1561: Hàng hóa xuất kho làm giảm giá trị hàng tồn kho
+- Nợ TK 632: Khi xuất kho bán hàng, doanh nghiệp ghi nhận chi phí giá vốn hàng bán (*)
+- Có TK 1561: Hàng hóa xuất kho làm giảm giá trị hàng tồn kho (*)
 - Nợ TK 13881: Ghi nhận khoản phải thu tạm vì đã giao hàng nhưng chưa xuất hóa đơn
-- Có TK 5111: Ghi nhận doanh thu bán hàng khi giao hàng cho khách
+- Có TK 5111: Ghi nhận doanh thu bán hàng khi giao hàng cho khách (*)
 
 4. VÍ DỤ:
 Xuất kho bán 100 sản phẩm A, giá vốn 50.000đ/sp, giá bán 80.000đ/sp:
-- Nợ TK 632: 5.000.000đ
-- Có TK 1561: 5.000.000đ
+- Nợ TK 632: 5.000.000đ (*)
+- Có TK 1561: 5.000.000đ (*)
 - Nợ TK 13881: 8.000.000đ
-- Có TK 5111: 8.000.000đ
+- Có TK 5111: 8.000.000đ (*)
+
+
+Ghi chú: Các dòng có dấu (*) là tài khoản có `account_source_type` = 'LOOKUP' - người dùng có thể thay đổi Tài khoản tùy vào đối tượng hạch toán.
 """
 
 # =============================================================================
@@ -623,7 +626,8 @@ class PostingEngineResolver:
                 "side": r["side"],
                 "account": acc,
                 "priority": r["priority"],
-                "description": r.get("description", "")
+                "description": r.get("description", ""),
+                "is_lookup": account_source_type == "LOOKUP"
             })
 
         return entries
@@ -789,7 +793,8 @@ class RagAccounting:
             acc = e["account"]
             acc_name = ACCOUNT_NAMES.get(acc, acc)
             side = "Dr" if e["side"] == "DEBIT" else "Cr"
-            print(f"    {side} {acc} ({acc_name})")
+            marker = " (*)" if e.get("is_lookup") else ""
+            print(f"    {side} {acc} ({acc_name}){marker}")
 
         # ========== STEP 3: BUILD PROMPT & CALL SLM ==========
         tx_name = TRANSACTION_NAMES.get(tx, tx)
@@ -798,13 +803,14 @@ class RagAccounting:
         print(f"    Question: {question}")
         print(f"    Transaction: {tx_name}")
 
-        # Build entries list for prompt
+        # Build entries list for prompt (với dấu * cho LOOKUP)
         entries_list = []
         for e in sorted(entries, key=lambda x: x["priority"]):
             acc = e["account"]
             acc_name = ACCOUNT_NAMES.get(acc, acc)
             side = "Nợ" if e["side"] == "DEBIT" else "Có"
-            entries_list.append(f"{side} TK {acc} - {acc_name}")
+            marker = " (*)" if e.get("is_lookup") else ""
+            entries_list.append(f"- {side} TK {acc}: {acc_name}{marker}")
         entries_text = "\n".join(entries_list)
 
         # System prompt
@@ -845,6 +851,10 @@ Trả lời theo định dạng:
             print("[Fallback] SLM output invalid, using fallback...")
             fallback = RagAccounting._generate_fallback(tx_name, entries)
             yield fallback
+        else:
+            # Luôn thêm ghi chú cuối cùng sau SLM output
+            note = "\n\nGhi chú: Các dòng có dấu (*) là tài khoản có `account_source_type` = 'LOOKUP' - người dùng có thể thay đổi Tài khoản tùy vào đối tượng hạch toán."
+            yield note
 
         print(f"\n    {'-'*40}")
 
@@ -860,7 +870,8 @@ Trả lời theo định dạng:
             acc = e["account"]
             acc_name = ACCOUNT_NAMES.get(acc, acc)
             side = "Nợ" if e["side"] == "DEBIT" else "Có"
-            lines.append(f"- {side} TK {acc}: {acc_name}")
+            marker = " (*)" if e.get("is_lookup") else ""
+            lines.append(f"- {side} TK {acc}: {acc_name}{marker}")
         lines.append("")
 
         # Section 3: GIẢI THÍCH
@@ -869,11 +880,20 @@ Trả lời theo định dạng:
             acc = e["account"]
             side = "Nợ" if e["side"] == "DEBIT" else "Có"
             desc = e.get("description", "")
-            lines.append(f"- {side} TK {acc}: {desc}")
+            marker = " (*)" if e.get("is_lookup") else ""
+            lines.append(f"- {side} TK {acc}: {desc}{marker}")
         lines.append("")
 
         # Section 4: VÍ DỤ
         lines.append("4. VÍ DỤ:")
-        lines.append("(Vui lòng tham khảo ví dụ cụ thể từ kế toán)")
+        for e in sorted(entries, key=lambda x: x["priority"]):
+            acc = e["account"]
+            side = "Nợ" if e["side"] == "DEBIT" else "Có"
+            marker = " (*)" if e.get("is_lookup") else ""
+            lines.append(f"- {side} TK {acc}: [số tiền]{marker}")
+        lines.append("")
+
+        # Ghi chú cuối cùng
+        lines.append("\n\nGhi chú: Các dòng có dấu (*) là tài khoản có `account_source_type` = 'LOOKUP' - người dùng có thể thay đổi Tài khoản tùy vào đối tượng hạch toán.")
 
         return "\n".join(lines)
