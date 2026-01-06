@@ -29,33 +29,47 @@ GL_MAPPING = CONFIG["gl_mapping"]
 POSTING_GROUPS = {g["code"]: g for g in CONFIG["posting_groups"]}
 ROLE_KEYS = CONFIG["role_keys"]
 
-
 # =============================================================================
-# ACCOUNT & TRANSACTION NAMES
+# ACCOUNT & TRANSACTION NAMES (UPDATED FOR CIRCULAR 99)
 # =============================================================================
 
 ACCOUNT_NAMES = {
-    "131": "Phải thu khách hàng",
-    "1331": "Thuế GTGT được khấu trừ",
-    "1388": "Phải thu khác",
-    "13881": "Phải thu tạm (Xuất kho bán hàng chưa có Hóa đơn phải thu)",
-    "1111": "Tiền mặt",
-    "1121": "Tiền gửi ngân hàng",
-    "152": "Nguyên vật liệu",
-    "153": "Công cụ dụng cụ",
-    "154": "Chi phí SXKD dở dang",
-    "155": "Thành phẩm",
-    "1561": "Hàng hóa",
-    "157": "Hàng gửi đi bán",
-    "331": "Phải trả người bán",
-    "3388": "Phải trả khác",
-    "33881": "Phải trả tạm (Nhập kho mua hàng chưa có Hóa đơn phải chi)",
-    "33311": "Thuế GTGT phải nộp",
-    "5111": "Doanh thu bán hàng hóa",
-    "5112": "Doanh thu bán thành phẩm",
-    "5113": "Doanh thu cung cấp dịch vụ",
-    "5211": "Chiết khấu thương mại",
-    "632": "Giá vốn hàng bán",
+    # Tài sản ngắn hạn
+    "111": "Tiền mặt",  # TT99 dùng 111
+    "112": "Tiền gửi không kỳ hạn",  # TT99 dùng 112
+    "131": "Phải thu của khách hàng",  #
+    "1331": "Thuế GTGT được khấu trừ",  #
+    "1388": "Phải thu khác",  #
+    "13881": "Phải thu tạm (Giao hàng chưa xuất HĐ - Tài khoản chi tiết nội bộ)",
+
+    # Hàng tồn kho
+    "152": "Nguyên liệu, vật liệu",  #
+    "153": "Công cụ, dụng cụ",  #
+    "154": "Chi phí SXKD dở dang",  #
+    "155": "Sản phẩm",  # TT99 dùng tên là Sản phẩm thay vì Thành phẩm
+    "156": "Hàng hóa",  # TT99 dùng 156 chung
+    "157": "Hàng gửi đi bán",  #
+
+    # Tài sản dài hạn & Sinh học (Mới)
+    "211": "Tài sản cố định hữu hình",  #
+    "215": "Tài sản sinh học",  # [MỚI] Theo TT99
+
+    # Nợ phải trả
+    "331": "Phải trả cho người bán",  # [cite: 9]
+    "33311": "Thuế GTGT đầu ra",  # [cite: 9]
+    "3388": "Phải trả, phải nộp khác",  # [cite: 11]
+    "33881": "Phải trả tạm (Nhập hàng chưa có HĐ - Tài khoản chi tiết nội bộ)",
+
+    # Vốn & Doanh thu
+    "511": "Doanh thu bán hàng và cung cấp dịch vụ",  # TT99 gộp chung 511
+    "521": "Các khoản giảm trừ doanh thu",  # TT99 gộp chung 521
+
+    # Chi phí
+    "632": "Giá vốn hàng bán",  #
+    "641": "Chi phí bán hàng",  #
+    "642": "Chi phí quản lý doanh nghiệp",  #
+    "811": "Chi phí khác",  #
+    "82112": "Chi phí thuế TNDN bổ sung (Thuế tối thiểu toàn cầu)",  # [MỚI]
 }
 
 TRANSACTION_NAMES = {
@@ -68,7 +82,7 @@ TRANSACTION_NAMES = {
 }
 
 # =============================================================================
-# FEW-SHOT EXAMPLES - Ví dụ Q&A hoàn chỉnh để SLM học theo
+# FEW-SHOT EXAMPLES (UPDATED FOR CIRCULAR 99)
 # =============================================================================
 
 FEW_SHOT_QA = """
@@ -77,23 +91,22 @@ Phiếu xuất kho bán hàng
 
 2. BẢNG BÚT TOÁN:
 - Nợ TK 632: Giá vốn hàng bán (*)
-- Có TK 1561: Hàng hóa (*)
+- Có TK 156: Hàng hóa (*)
 - Nợ TK 13881: Phải thu tạm
-- Có TK 5111: Doanh thu bán hàng hóa (*)
+- Có TK 511: Doanh thu bán hàng và cung cấp dịch vụ (*)
 
 3. GIẢI THÍCH:
 - Nợ TK 632: Khi xuất kho bán hàng, doanh nghiệp ghi nhận chi phí giá vốn hàng bán (*)
-- Có TK 1561: Hàng hóa xuất kho làm giảm giá trị hàng tồn kho (*)
+- Có TK 156: Hàng hóa xuất kho làm giảm giá trị hàng tồn kho (Theo TT99 dùng TK 156) (*)
 - Nợ TK 13881: Ghi nhận khoản phải thu tạm vì đã giao hàng nhưng chưa xuất hóa đơn
-- Có TK 5111: Ghi nhận doanh thu bán hàng khi giao hàng cho khách (*)
+- Có TK 511: Ghi nhận doanh thu bán hàng khi giao hàng cho khách (Theo TT99 dùng TK 511) (*)
 
 4. VÍ DỤ:
 Xuất kho bán 100 sản phẩm A, giá vốn 50.000đ/sp, giá bán 80.000đ/sp:
 - Nợ TK 632: 5.000.000đ (*)
-- Có TK 1561: 5.000.000đ (*)
+- Có TK 156: 5.000.000đ (*)
 - Nợ TK 13881: 8.000.000đ
-- Có TK 5111: 8.000.000đ (*)
-
+- Có TK 511: 8.000.000đ (*)
 
 Ghi chú: Các dòng có dấu (*) là tài khoản có `account_source_type` = 'LOOKUP' - người dùng có thể thay đổi Tài khoản tùy vào đối tượng hạch toán.
 """
@@ -123,13 +136,17 @@ SYNONYMS = {
     # Tiền
     "thu tiền": ["nhận tiền", "tiền về", "cash in", "receipt"],
     "chi tiền": ["trả tiền", "thanh toán", "cash out", "payment"],
-    "tiền mặt": ["cash", "TM"],
-    "chuyển khoản": ["CK", "bank transfer", "tiền gửi"],
+    "tiền mặt": ["cash", "TM", "111"],
+    "chuyển khoản": ["CK", "bank transfer", "tiền gửi", "112"],
 
     # Thuế
-    "thuế": ["VAT", "GTGT", "tax"],
+    "thuế": ["VAT", "GTGT", "tax", "thuế tndn", "thuế tối thiểu"],
     "thuế đầu ra": ["VAT out", "output tax"],
     "thuế đầu vào": ["VAT in", "input tax"],
+    "thuế tối thiểu toàn cầu": ["global min tax", "pillar 2", "82112"],
+
+    # Tài sản sinh học (Mới TT99)
+    "tài sản sinh học": ["cây trồng", "vật nuôi", "biological asset", "215", "gia súc", "vườn cây"],
 
     # Kế toán
     "hạch toán": ["định khoản", "ghi sổ", "bút toán", "journal entry"],
@@ -240,6 +257,7 @@ CONCEPTS = {
         "hàng nhập kho", "goods receipt", "GRN",
         # Biến thể ngắn
         "nhập kho", "nhập hàng", "hàng về", "phiếu nhập", "nhận hàng",
+        "tài sản sinh học", "mua cây trồng", "mua vật nuôi",  # Thêm concept cho TK 215
     ],
     "PURCHASE_INVOICE": [
         # Khớp với keywords JSON
@@ -269,7 +287,7 @@ class MiniRAGGraph:
     """
     Heterogeneous Graph với các loại node:
     - TRANSACTION: DO_SALE, SALES_INVOICE, etc.
-    - ACCOUNT: 131, 632, 1561, etc.
+    - ACCOUNT: 131, 632, 156, etc.
     - KEYWORD: các từ khóa từ config
     - CONCEPT: các khái niệm kế toán
 
@@ -352,7 +370,7 @@ class MiniRAGGraph:
         self._connect_concepts(sale_concepts)
 
         # Mua hàng domain
-        purchase_concepts = ["nhập kho", "mua hàng", "nhận hàng", "hàng về"]
+        purchase_concepts = ["nhập kho", "mua hàng", "nhận hàng", "hàng về", "tài sản sinh học"]
         self._connect_concepts(purchase_concepts)
 
         # Công nợ domain
@@ -366,7 +384,7 @@ class MiniRAGGraph:
     def _connect_concepts(self, concepts):
         """Kết nối các concepts trong cùng domain"""
         for i, c1 in enumerate(concepts):
-            for c2 in concepts[i+1:]:
+            for c2 in concepts[i + 1:]:
                 n1, n2 = f"CONCEPT:{c1}", f"CONCEPT:{c2}"
                 if self.graph.has_node(n1) and self.graph.has_node(n2):
                     self.graph.add_edge(n1, n2, edge_type="RELATED", weight=0.5)
@@ -575,7 +593,7 @@ class MiniRAGRetriever:
         # 7. Chọn transaction tốt nhất
         if not scores:
             best_tx = max(self.tx_embeddings.keys(),
-                         key=lambda t: np.dot(query_embedding, self.tx_embeddings[t]))
+                          key=lambda t: np.dot(query_embedding, self.tx_embeddings[t]))
             method = "embedding_only"
         else:
             best_tx = max(scores.keys(), key=lambda k: scores[k])
@@ -859,7 +877,7 @@ Trả lời theo định dạng:
             note = "\n\nGhi chú: Các dòng có dấu (*) là tài khoản có `account_source_type` = 'LOOKUP' - người dùng có thể thay đổi Tài khoản tùy vào đối tượng hạch toán."
             yield note
 
-        print(f"\n    {'-'*40}")
+        print(f"\n    {'-' * 40}")
 
     @staticmethod
     def _generate_fallback(tx_name: str, entries: list) -> str:
@@ -897,6 +915,7 @@ Trả lời theo định dạng:
         lines.append("")
 
         # Ghi chú cuối cùng
-        lines.append("\n\nGhi chú: Các dòng có dấu (*) là tài khoản có `account_source_type` = 'LOOKUP' - người dùng có thể thay đổi Tài khoản tùy vào đối tượng hạch toán.")
+        lines.append(
+            "\n\nGhi chú: Các dòng có dấu (*) là tài khoản có `account_source_type` = 'LOOKUP' - người dùng có thể thay đổi Tài khoản tùy vào đối tượng hạch toán.")
 
         return "\n".join(lines)
