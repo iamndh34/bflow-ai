@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from fastapi.responses import StreamingResponse
-from app.services.rag_service import RagAccounting
+from app.services.rag_service import RagRouter
 
 
 router = APIRouter(
@@ -9,21 +9,31 @@ router = APIRouter(
 )
 
 
+# =============================================================================
+# UNIFIED ENDPOINT - Tự động phân loại: Posting Engine hoặc COA
+# =============================================================================
+
 @router.get("/posting-engine/ask")
 async def ask_accounting(
-    question: str = Query(..., min_length=3)
+    question: str = Query(..., min_length=2, description="Câu hỏi về kế toán")
 ):
-    """Hoi dap ke toan (streaming response)"""
+    """
+    Hỏi đáp kế toán (streaming response)
+
+    Tự động phân loại:
+    - Nghiệp vụ/Bút toán -> Posting Engine
+    - Tra cứu tài khoản -> COA
+    """
     return StreamingResponse(
-        RagAccounting.ask(question),
+        RagRouter.ask(question),
         media_type="text/plain; charset=utf-8"
     )
 
 
 @router.get("/posting-engine/get_history")
 async def get_history():
-    """Lay lich su hoi thoai (5 cau hoi gan nhat)"""
-    history = RagAccounting.get_context()
+    """Lấy lịch sử hội thoại (reload từ file JSON, 10 câu gần nhất)"""
+    history = RagRouter.reload_history()
     return {
         "count": len(history),
         "history": history
@@ -32,6 +42,6 @@ async def get_history():
 
 @router.post("/posting-engine/reset_history")
 async def reset_history():
-    """Xoa lich su hoi thoai"""
-    RagAccounting.reset_context()
+    """Xóa lịch sử hội thoại (xóa file JSON)"""
+    RagRouter.reset_history()
     return {"message": "History cleared"}

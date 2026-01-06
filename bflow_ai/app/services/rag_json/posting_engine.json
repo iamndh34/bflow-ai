@@ -4,7 +4,7 @@
       "module_id": 0,
       "transaction_key": "DO_SALE",
       "django_model": "delivery.orderdeliverysub",
-      "description": "Phiếu xuất kho bán hàng - ghi nhận giá vốn hàng bán và doanh thu khi giao hàng cho khách hàng (Theo TT99)",
+      "description": "Phiếu xuất kho bán hàng - ghi nhận giá vốn hàng bán và doanh thu khi giao hàng cho khách hàng",
       "keywords": [
         "xuất kho bán", "phiếu xuất kho", "giao hàng cho khách",
         "giảm tồn kho", "kết chuyển giá vốn", "phiếu giao hàng",
@@ -16,7 +16,7 @@
       "module_id": 0,
       "transaction_key": "SALES_INVOICE",
       "django_model": "arinvoice.arinvoice",
-      "description": "Hóa đơn phải thu - ghi nhận công nợ phải thu khách hàng, thuế GTGT đầu ra và đối trừ với phiếu xuất kho (Theo TT99)",
+      "description": "Hóa đơn phải thu - ghi nhận công nợ phải thu khách hàng, thuế GTGT đầu ra và đối trừ với phiếu xuất kho",
       "keywords": [
         "hóa đơn bán hàng", "hóa đơn đầu ra", "hóa đơn phải thu", "xuất hóa đơn cho khách", "lập hóa đơn bán",
         "công nợ phải thu", "thuế đầu ra", "VAT đầu ra",
@@ -28,7 +28,7 @@
       "module_id": 0,
       "transaction_key": "CASH_IN",
       "django_model": "financialcashflow.cashinflow",
-      "description": "Phiếu thu tiền - ghi nhận thu tiền mặt hoặc tiền gửi ngân hàng từ khách hàng (Theo TT99)",
+      "description": "Phiếu thu tiền - ghi nhận thu tiền mặt hoặc tiền gửi ngân hàng từ khách hàng",
       "keywords": [
         "thu tiền khách hàng", "khách hàng trả tiền", "phiếu thu tiền",
         "thu hồi công nợ", "nhận thanh toán từ khách", "thu nợ khách",
@@ -40,7 +40,7 @@
       "module_id": 1,
       "transaction_key": "GRN_PURCHASE",
       "django_model": "inventory.goodsreceipt",
-      "description": "Phiếu nhập kho mua hàng - ghi nhận tăng hàng tồn kho và phải trả tạm khi nhận hàng từ nhà cung cấp (Theo TT99)",
+      "description": "Phiếu nhập kho mua hàng - ghi nhận tăng hàng tồn kho và phải trả tạm khi nhận hàng từ nhà cung cấp",
       "keywords": [
         "nhập kho mua", "phiếu nhập kho", "nhận hàng từ NCC",
         "tăng tồn kho", "hàng về kho", "nhập hàng mua",
@@ -52,7 +52,7 @@
       "module_id": 1,
       "transaction_key": "PURCHASE_INVOICE",
       "django_model": "apinvoice.apinvoice",
-      "description": "Hóa đơn phải chi - ghi nhận công nợ phải trả nhà cung cấp, thuế GTGT đầu vào và đối trừ với phiếu nhập kho (Theo TT99)",
+      "description": "Hóa đơn phải chi - ghi nhận công nợ phải trả nhà cung cấp, thuế GTGT đầu vào và đối trừ với phiếu nhập kho",
       "keywords": [
         "hóa đơn mua hàng", "hóa đơn đầu vào", "hóa đơn phải chi", "nhận hóa đơn từ NCC", "hóa đơn nhà cung cấp",
         "công nợ phải trả", "thuế đầu vào", "VAT đầu vào",
@@ -64,7 +64,7 @@
       "module_id": 1,
       "transaction_key": "CASH_OUT",
       "django_model": "financialcashflow.cashoutflow",
-      "description": "Phiếu chi tiền - ghi nhận chi tiền mặt hoặc chuyển khoản thanh toán cho nhà cung cấp (Theo TT99)",
+      "description": "Phiếu chi tiền - ghi nhận chi tiền mặt hoặc chuyển khoản thanh toán cho nhà cung cấp",
       "keywords": [
         "chi tiền cho NCC", "trả tiền nhà cung cấp", "phiếu chi tiền",
         "thanh toán công nợ NCC", "trả nợ nhà cung cấp", "chi trả NCC",
