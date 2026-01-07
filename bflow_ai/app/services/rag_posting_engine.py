@@ -9,6 +9,7 @@ from sentence_transformers import SentenceTransformer
 
 from app.core.config import settings
 from .history_manager import HISTORY_MANAGER
+from .stream_utils import stream_by_sentence
 
 # =============================================================================
 # CONFIG LOADING
@@ -403,7 +404,7 @@ BÚT TOÁN TỪ HỆ THỐNG (chỉ sử dụng các bút toán này):
 Trả lời theo định dạng mẫu sau:
 {few_shot_example}"""
 
-        # 4. Call SLM
+        # 4. Call SLM - yield theo câu để tránh lỗi encoding tiếng Việt
         print(f"[Posting] Asking SLM about {tx} with entries_text:\n{entries_text}")
         full_response = ""
         try:
@@ -414,11 +415,9 @@ Trả lời theo định dạng mẫu sau:
                           {"role": "user", "content": slm_prompt}],
                 stream=True
             )
-            for chunk in stream:
-                content = chunk.get("message", {}).get("content", "")
-                if content:
-                    full_response += content
-                    yield content
+            for sentence in stream_by_sentence(stream):
+                full_response += sentence
+                yield sentence
         except Exception as e:
             print(f"[Posting Error] {e}")
 

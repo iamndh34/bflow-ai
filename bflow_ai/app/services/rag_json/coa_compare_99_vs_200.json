@@ -1,0 +1,398 @@
+[
+  {
+    "account_number": "111",
+    "name_tt200": "Tiền mặt",
+    "name_tt99": "Tiền mặt",
+    "change_type": "DETAILS_REMOVED",
+    "content": "Tài khoản 111 (Tiền mặt): Trong Thông tư 99, tài khoản này vẫn giữ nguyên tên nhưng không còn các tài khoản chi tiết cấp 2 (1111 - Tiền Việt Nam, 1112 - Ngoại tệ, 1113 - Vàng tiền tệ) như Thông tư 200.",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "112",
+    "name_tt200": "Tiền gửi Ngân hàng",
+    "name_tt99": "Tiền gửi không kỳ hạn",
+    "change_type": "RENAMED_AND_DETAILS_REMOVED",
+    "content": "Tài khoản 112: Đổi tên từ 'Tiền gửi Ngân hàng' (TT200) thành 'Tiền gửi không kỳ hạn' (TT99). Đồng thời Thông tư 99 bỏ các tài khoản chi tiết cấp 2 (1121, 1122, 1123).",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "113",
+    "name_tt200": "Tiền đang chuyển",
+    "name_tt99": "Tiền đang chuyển",
+    "change_type": "DETAILS_REMOVED",
+    "content": "Tài khoản 113 (Tiền đang chuyển): Thông tư 99 không còn các tài khoản chi tiết (1131, 1132) như Thông tư 200.",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "121",
+    "name_tt200": "Chứng khoán kinh doanh",
+    "name_tt99": "Chứng khoán kinh doanh",
+    "change_type": "DETAILS_REMOVED",
+    "content": "Tài khoản 121 (Chứng khoán kinh doanh): Thông tư 99 bỏ các tài khoản chi tiết (1211 - Cổ phiếu, 1212 - Trái phiếu, 1218 - Chứng khoán khác).",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "1383",
+    "name_tt200": null,
+    "name_tt99": "Thuế TTĐB của hàng nhập khẩu",
+    "change_type": "ADDED",
+    "content": "Tài khoản 1383 (Thuế TTĐB của hàng nhập khẩu): Đây là tài khoản mới được thêm vào trong Thông tư 99. Thông tư 200 không có tài khoản này.",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "1385",
+    "name_tt200": "Phải thu về cổ phần hoá",
+    "name_tt99": null,
+    "change_type": "REMOVED",
+    "content": "Tài khoản 1385 (Phải thu về cổ phần hoá): Tài khoản này đã bị bãi bỏ trong Thông tư 99.",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "153",
+    "name_tt200": "Công cụ, dụng cụ",
+    "name_tt99": "Công cụ, dụng cụ",
+    "change_type": "DETAILS_REMOVED",
+    "content": "Tài khoản 153 (Công cụ, dụng cụ): Thông tư 99 bỏ các tài khoản chi tiết (1531, 1532, 1533, 1534).",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "155",
+    "name_tt200": "Thành phẩm",
+    "name_tt99": "Sản phẩm",
+    "change_type": "RENAMED_AND_DETAILS_REMOVED",
+    "content": "Tài khoản 155: Đổi tên từ 'Thành phẩm' (TT200) thành 'Sản phẩm' (TT99). Thông tư 99 cũng không có các tài khoản chi tiết (1551, 1557).",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "158",
+    "name_tt200": "Hàng hoá kho bảo thuế",
+    "name_tt99": "Nguyên liệu, vật tư tại kho bảo thuế",
+    "change_type": "RENAMED",
+    "content": "Tài khoản 158: Đổi tên từ 'Hàng hoá kho bảo thuế' (TT200) thành 'Nguyên liệu, vật tư tại kho bảo thuế' (TT99).",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "161",
+    "name_tt200": "Chi sự nghiệp",
+    "name_tt99": null,
+    "change_type": "REMOVED",
+    "content": "Tài khoản 161 (Chi sự nghiệp): Đã bị bãi bỏ hoàn toàn trong Thông tư 99 (bao gồm cả các TK chi tiết 1611, 1612).",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "215",
+    "name_tt200": null,
+    "name_tt99": "Tài sản sinh học",
+    "change_type": "ADDED",
+    "content": "Tài khoản 215 (Tài sản sinh học): Đây là tài khoản mới trong Thông tư 99. Bao gồm các tài khoản chi tiết: 2151 (Súc vật nuôi cho sản phẩm định kỳ), 2152 (Súc vật nuôi lấy sản phẩm một lần), 2153 (Cây trồng theo mùa vụ hoặc lấy sản phẩm một lần).",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "2295",
+    "name_tt200": null,
+    "name_tt99": "Dự phòng tổn thất tài sản sinh học",
+    "change_type": "ADDED",
+    "content": "Tài khoản 2295 (Dự phòng tổn thất tài sản sinh học): Tài khoản chi tiết mới được thêm vào trong Thông tư 99 thuộc nhóm Dự phòng tổn thất tài sản.",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "2413",
+    "name_tt200": "Sửa chữa lớn TSCĐ",
+    "name_tt99": "Sửa chữa, bảo dưỡng định kỳ TSCĐ",
+    "change_type": "RENAMED",
+    "content": "Tài khoản 2413: Đổi tên từ 'Sửa chữa lớn TSCĐ' (TT200) thành 'Sửa chữa, bảo dưỡng định kỳ TSCĐ' (TT99).",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "2414",
+    "name_tt200": null,
+    "name_tt99": "Nâng cấp, cải tạo TSCĐ",
+    "change_type": "ADDED",
+    "content": "Tài khoản 2414 (Nâng cấp, cải tạo TSCĐ): Tài khoản chi tiết mới được thêm vào trong Thông tư 99 thuộc nhóm XDCB dở dang.",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "242",
+    "name_tt200": "Chi phí trả trước",
+    "name_tt99": "Chi phí chờ phân bổ",
+    "change_type": "RENAMED",
+    "content": "Tài khoản 242: Đổi tên từ 'Chi phí trả trước' (TT200) thành 'Chi phí chờ phân bổ' (TT99).",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "244",
+    "name_tt200": "Cầm cố, thế chấp, ký quỹ, ký cược",
+    "name_tt99": "Ký quỹ, ký cược",
+    "change_type": "RENAMED",
+    "content": "Tài khoản 244: Đổi tên từ 'Cầm cố, thế chấp, ký quỹ, ký cược' (TT200) thành ngắn gọn là 'Ký quỹ, ký cược' (TT99).",
+    "metadata": {
+      "category": "Tài sản",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "332",
+    "name_tt200": null,
+    "name_tt99": "Phải trả cổ tức, lợi nhuận",
+    "change_type": "ADDED",
+    "content": "Tài khoản 332 (Phải trả cổ tức, lợi nhuận): Tài khoản mới được thêm vào trong Thông tư 99.",
+    "metadata": {
+      "category": "Nợ phải trả",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "3385",
+    "name_tt200": "Phải trả về cổ phần hoá",
+    "name_tt99": null,
+    "change_type": "REMOVED",
+    "content": "Tài khoản 3385 (Phải trả về cổ phần hoá): Đã bị bãi bỏ trong Thông tư 99.",
+    "metadata": {
+      "category": "Nợ phải trả",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "3387",
+    "name_tt200": "Doanh thu chưa thực hiện",
+    "name_tt99": "Doanh thu chờ phân bổ",
+    "change_type": "RENAMED",
+    "content": "Tài khoản 3387: Đổi tên từ 'Doanh thu chưa thực hiện' (TT200) thành 'Doanh thu chờ phân bổ' (TT99).",
+    "metadata": {
+      "category": "Nợ phải trả",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "3562",
+    "name_tt200": "Quỹ PTKH&CN đã hình thành TSCĐ",
+    "name_tt99": "Quỹ PTKH&CN đã hình thành tài sản",
+    "change_type": "RENAMED",
+    "content": "Tài khoản 3562: Đổi tên từ 'Quỹ PTKH&CN đã hình thành TSCĐ' (TT200) thành 'Quỹ PTKH&CN đã hình thành tài sản' (TT99).",
+    "metadata": {
+      "category": "Nợ phải trả",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "4112",
+    "name_tt200": "Thặng dư vốn cổ phần",
+    "name_tt99": "Thặng dư vốn",
+    "change_type": "RENAMED",
+    "content": "Tài khoản 4112: Đổi tên từ 'Thặng dư vốn cổ phần' (TT200) thành 'Thặng dư vốn' (TT99).",
+    "metadata": {
+      "category": "Vốn chủ sở hữu",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "417",
+    "name_tt200": "Quỹ hỗ trợ sắp xếp doanh nghiệp",
+    "name_tt99": null,
+    "change_type": "REMOVED",
+    "content": "Tài khoản 417 (Quỹ hỗ trợ sắp xếp doanh nghiệp): Đã bị bãi bỏ trong Thông tư 99.",
+    "metadata": {
+      "category": "Vốn chủ sở hữu",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "419",
+    "name_tt200": "Cổ phiếu quỹ",
+    "name_tt99": "Cổ phiếu mua lại của chính mình",
+    "change_type": "RENAMED",
+    "content": "Tài khoản 419: Đổi tên từ 'Cổ phiếu quỹ' (TT200) thành 'Cổ phiếu mua lại của chính mình' (TT99).",
+    "metadata": {
+      "category": "Vốn chủ sở hữu",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "4211",
+    "name_tt200": "Lợi nhuận sau thuế chưa phân phối năm trước",
+    "name_tt99": "Lợi nhuận sau thuế chưa phân phối lũy kế đến cuối năm trước",
+    "change_type": "RENAMED",
+    "content": "Tài khoản 4211: Đổi tên chi tiết hơn trong TT99 thành 'Lợi nhuận sau thuế chưa phân phối lũy kế đến cuối năm trước'.",
+    "metadata": {
+      "category": "Vốn chủ sở hữu",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "441",
+    "name_tt200": "Nguồn vốn đầu tư XDCB",
+    "name_tt99": null,
+    "change_type": "REMOVED",
+    "content": "Tài khoản 441 (Nguồn vốn đầu tư xây dựng cơ bản): Đã bị bãi bỏ trong Thông tư 99.",
+    "metadata": {
+      "category": "Vốn chủ sở hữu",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "461",
+    "name_tt200": "Nguồn kinh phí sự nghiệp",
+    "name_tt99": null,
+    "change_type": "REMOVED",
+    "content": "Tài khoản 461 (Nguồn kinh phí sự nghiệp): Đã bị bãi bỏ trong Thông tư 99.",
+    "metadata": {
+      "category": "Vốn chủ sở hữu",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "466",
+    "name_tt200": "Nguồn kinh phí đã hình thành TSCĐ",
+    "name_tt99": null,
+    "change_type": "REMOVED",
+    "content": "Tài khoản 466 (Nguồn kinh phí đã hình thành TSCĐ): Đã bị bãi bỏ trong Thông tư 99.",
+    "metadata": {
+      "category": "Vốn chủ sở hữu",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "611",
+    "name_tt200": "Mua hàng",
+    "name_tt99": null,
+    "change_type": "REMOVED",
+    "content": "Tài khoản 611 (Mua hàng): Đã bị bãi bỏ trong Thông tư 99. Trước đây dùng cho phương pháp kiểm kê định kỳ.",
+    "metadata": {
+      "category": "Chi phí SXKD",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "6232",
+    "name_tt200": "Chi phí vật liệu",
+    "name_tt99": "Chi phí nguyên, vật liệu",
+    "change_type": "RENAMED",
+    "content": "Tài khoản 6232: Đổi tên từ 'Chi phí vật liệu' thành 'Chi phí nguyên, vật liệu' trong TT99.",
+    "metadata": {
+      "category": "Chi phí SXKD",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "6275",
+    "name_tt200": null,
+    "name_tt99": "Thuế, phí, lệ phí",
+    "change_type": "ADDED",
+    "content": "Tài khoản 6275 (Thuế, phí, lệ phí): Tài khoản chi tiết mới được thêm vào nhóm Chi phí sản xuất chung trong Thông tư 99.",
+    "metadata": {
+      "category": "Chi phí SXKD",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "631",
+    "name_tt200": "Giá thành sản xuất",
+    "name_tt99": null,
+    "change_type": "REMOVED",
+    "content": "Tài khoản 631 (Giá thành sản xuất): Đã bị bãi bỏ trong Thông tư 99.",
+    "metadata": {
+      "category": "Chi phí SXKD",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "6415",
+    "name_tt200": null,
+    "name_tt99": "Thuế, phí, lệ phí",
+    "change_type": "ADDED",
+    "content": "Tài khoản 6415 (Thuế, phí, lệ phí): Tài khoản chi tiết mới được thêm vào nhóm Chi phí bán hàng trong Thông tư 99.",
+    "metadata": {
+      "category": "Chi phí SXKD",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  },
+  {
+    "account_number": "8211",
+    "name_tt200": "Chi phí thuế TNDN hiện hành",
+    "name_tt99": "Chi phí thuế TNDN hiện hành",
+    "change_type": "DETAILS_ADDED",
+    "content": "Tài khoản 8211: Thông tư 99 bổ sung 2 tài khoản chi tiết cấp 3 mới là 82111 (Chi phí thuế TNDN hiện hành theo Luật thuế) và 82112 (Chi phí thuế TNDN bổ sung theo quy định về thuế tối thiểu toàn cầu).",
+    "metadata": {
+      "category": "Chi phí khác",
+      "circular_from": "200",
+      "circular_to": "99"
+    }
+  }
+]

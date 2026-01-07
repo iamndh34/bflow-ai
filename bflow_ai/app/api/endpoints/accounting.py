@@ -15,17 +15,18 @@ router = APIRouter(
 
 @router.get("/posting-engine/ask")
 async def ask_accounting(
-    question: str = Query(..., min_length=2, description="Câu hỏi về kế toán")
+    question: str = Query(..., min_length=2, description="Câu hỏi về kế toán"),
+    chat_type: str = Query("thinking", description="Chế độ chat: 'thinking' (phân loại thông minh) hoặc 'free' (tự do)")
 ):
     """
     Hỏi đáp kế toán (streaming response)
 
-    Tự động phân loại:
-    - Nghiệp vụ/Bút toán -> Posting Engine
-    - Tra cứu tài khoản -> COA
+    chat_type:
+    - 'thinking': Tự động phân loại (COA, Posting Engine, Compare, etc.)
+    - 'free': Chế độ tự do - SLM trả lời trực tiếp không qua phân loại
     """
     return StreamingResponse(
-        RagRouter.ask(question),
+        RagRouter.ask(question, chat_type=chat_type),
         media_type="text/plain; charset=utf-8"
     )
 

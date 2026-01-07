@@ -9,6 +9,7 @@ import ollama
 from sentence_transformers import SentenceTransformer
 
 from app.core.config import settings
+from .stream_utils import stream_by_sentence
 
 # =============================================================================
 # CONFIG & DATA LOADING
@@ -17,6 +18,7 @@ from app.core.config import settings
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COA_99_FILE = os.path.join(BASE_DIR, "services", "rag_json", "coa_99.json")
 COA_200_FILE = os.path.join(BASE_DIR, "services", "rag_json", "coa_200.json")
+COA_COMPARE_FILE = os.path.join(BASE_DIR, "services", "rag_json", "coa_compare_99_vs_200.json")
 
 # Load TT99
 if not os.path.exists(COA_99_FILE):
@@ -34,6 +36,14 @@ else:
     with open(COA_200_FILE, "r", encoding="utf-8") as f:
         COA_200_DATA = json.load(f)
 
+# Load Compare Data (TT99 vs TT200)
+if not os.path.exists(COA_COMPARE_FILE):
+    print(f"[WARN] {COA_COMPARE_FILE} not found.")
+    COA_COMPARE_DATA = []
+else:
+    with open(COA_COMPARE_FILE, "r", encoding="utf-8") as f:
+        COA_COMPARE_DATA = json.load(f)
+
 # Build indexes for TT99 (default)
 COA_DATA = COA_99_DATA
 COA_BY_CODE = {acc["code"]: acc for acc in COA_99_DATA}
@@ -46,6 +56,11 @@ for acc in COA_99_DATA:
 
 # Build indexes for TT200
 COA_200_BY_CODE = {acc["code"]: acc for acc in COA_200_DATA}
+
+# Build indexes for Compare Data by change_type
+COA_COMPARE_BY_TYPE = defaultdict(list)
+for item in COA_COMPARE_DATA:
+    COA_COMPARE_BY_TYPE[item["change_type"]].append(item)
 
 # =============================================================================
 # FEW-SHOT PROMPTS (UPDATED PROFESSIONAL VERSION)
@@ -177,7 +192,7 @@ Hãy trả lời theo định dạng mẫu sau:
 
         print(f"[COA] SLM Generating (streaming)...")
 
-        # 4. Stream response
+        # 4. Stream response - yield theo câu để tránh lỗi encoding
         slm_output = ""
         try:
             client = ollama.Client(host=settings.OLLAMA_HOST)
@@ -189,11 +204,9 @@ Hãy trả lời theo định dạng mẫu sau:
                 ],
                 stream=True
             )
-            for chunk in stream:
-                content = chunk.get("message", {}).get("content", "")
-                if content:
-                    slm_output += content
-                    yield content
+            for sentence in stream_by_sentence(stream):
+                slm_output += sentence
+                yield sentence
         except Exception as e:
             print(f"[COA SLM Error] {e}")
 
@@ -327,7 +340,7 @@ Hãy trả lời theo định dạng mẫu sau:
 
         print(f"[COMPARE] SLM Generating...")
 
-        # 4. Stream response
+        # 4. Stream response - yield theo câu để tránh lỗi encoding
         slm_output = ""
         try:
             client = ollama.Client(host=settings.OLLAMA_HOST)
@@ -339,11 +352,9 @@ Hãy trả lời theo định dạng mẫu sau:
                 ],
                 stream=True
             )
-            for chunk in stream:
-                content = chunk.get("message", {}).get("content", "")
-                if content:
-                    slm_output += content
-                    yield content
+            for sentence in stream_by_sentence(stream):
+                slm_output += sentence
+                yield sentence
         except Exception as e:
             print(f"[COMPARE SLM Error] {e}")
 
@@ -420,77 +431,56 @@ Hãy trả lời theo định dạng mẫu sau:
     @classmethod
     def _analyze_circular_diff(cls) -> dict:
         """
-        Phân tích sự khác biệt giữa TT200 và TT99 từ dữ liệu JSON.
-        Returns dict với các key: new_accounts, removed_accounts, renamed_accounts
+        Lấy dữ liệu so sánh từ file coa_compare_99_vs_200.json
+        Returns dict với các key theo change_type
         """
-        codes_99 = set(COA_BY_CODE.keys())
-        codes_200 = set(COA_200_BY_CODE.keys())
-
-        # TK mới (chỉ có trong TT99)
-        new_codes = codes_99 - codes_200
-        new_accounts = [COA_BY_CODE[code] for code in sorted(new_codes)]
-
-        # TK bị xóa (chỉ có trong TT200)
-        removed_codes = codes_200 - codes_99
-        removed_accounts = [COA_200_BY_CODE[code] for code in sorted(removed_codes)]
-
-        # TK đổi tên (có cả 2 nhưng tên khác nhau)
-        common_codes = codes_99 & codes_200
-        renamed_accounts = []
-        for code in sorted(common_codes):
-            acc_99 = COA_BY_CODE[code]
-            acc_200 = COA_200_BY_CODE[code]
-            if acc_99['name'] != acc_200['name']:
-                renamed_accounts.append({
-                    'code': code,
-                    'old_name': acc_200['name'],
-                    'new_name': acc_99['name'],
-                    'type_name': acc_99['type_name']
-                })
-
         return {
-            'new_accounts': new_accounts,
-            'removed_accounts': removed_accounts,
-            'renamed_accounts': renamed_accounts,
-            'total_99': len(codes_99),
-            'total_200': len(codes_200)
+            'added': COA_COMPARE_BY_TYPE.get('ADDED', []),
+            'removed': COA_COMPARE_BY_TYPE.get('REMOVED', []),
+            'renamed': COA_COMPARE_BY_TYPE.get('RENAMED', []),
+            'renamed_and_details_removed': COA_COMPARE_BY_TYPE.get('RENAMED_AND_DETAILS_REMOVED', []),
+            'details_removed': COA_COMPARE_BY_TYPE.get('DETAILS_REMOVED', []),
+            'details_added': COA_COMPARE_BY_TYPE.get('DETAILS_ADDED', []),
+            'total_changes': len(COA_COMPARE_DATA)
         }
 
     @classmethod
     def compare_circular(cls, question: str):
         """
         So sánh TỔNG QUAN giữa TT200 và TT99 (streaming response)
+        Sử dụng dữ liệu từ file coa_compare_99_vs_200.json
         """
         print(f"\n[COMPARE_CIRCULAR] Question: {question}")
 
-        # 1. Phân tích sự khác biệt
+        # 1. Lấy dữ liệu so sánh từ file
         diff = cls._analyze_circular_diff()
 
-        print(f"[COMPARE_CIRCULAR] New: {len(diff['new_accounts'])}, Removed: {len(diff['removed_accounts'])}, Renamed: {len(diff['renamed_accounts'])}")
+        print(f"[COMPARE_CIRCULAR] Added: {len(diff['added'])}, Removed: {len(diff['removed'])}, Renamed: {len(diff['renamed'])}, Total: {diff['total_changes']}")
 
         # 2. Build context cho SLM
         context = cls._build_circular_context(diff)
 
         # 3. Build prompt
         system_prompt = """Bạn là chuyên gia kế toán Việt Nam. LUÔN trả lời bằng TIẾNG VIỆT.
-Dựa trên dữ liệu phân tích được cung cấp, hãy tóm tắt những điểm khác biệt chính giữa Thông tư 200/2014/TT-BTC và Thông tư 99/2025/TT-BTC về hệ thống tài khoản kế toán.
+Dựa trên dữ liệu so sánh được cung cấp, hãy tóm tắt những điểm khác biệt chính giữa Thông tư 200/2014/TT-BTC và Thông tư 99/2025/TT-BTC về hệ thống tài khoản kế toán.
 Trình bày rõ ràng, có cấu trúc, dễ hiểu."""
 
         slm_prompt = f"""Câu hỏi: {question}
 
-Dữ liệu phân tích tự động từ danh mục tài khoản:
+Dữ liệu so sánh giữa TT200 và TT99:
 {context}
 
 Hãy tóm tắt những điểm khác biệt chính, bao gồm:
-1. Tổng quan về số lượng tài khoản
+1. Tổng quan về các thay đổi
 2. Các tài khoản mới được bổ sung trong TT99
 3. Các tài khoản bị loại bỏ so với TT200
 4. Các tài khoản được đổi tên
-5. Nhận xét tổng quan về xu hướng thay đổi"""
+5. Các tài khoản bị bỏ chi tiết cấp 2
+6. Nhận xét tổng quan về xu hướng thay đổi"""
 
         print(f"[COMPARE_CIRCULAR] SLM Generating...")
 
-        # 4. Stream response
+        # 4. Stream response - yield theo từ để tránh lỗi encoding
         slm_output = ""
         try:
             client = ollama.Client(host=settings.OLLAMA_HOST)
@@ -502,11 +492,9 @@ Hãy tóm tắt những điểm khác biệt chính, bao gồm:
                 ],
                 stream=True
             )
-            for chunk in stream:
-                content = chunk.get("message", {}).get("content", "")
-                if content:
-                    slm_output += content
-                    yield content
+            for sentence in stream_by_sentence(stream):
+                slm_output += sentence
+                yield sentence
         except Exception as e:
             print(f"[COMPARE_CIRCULAR SLM Error] {e}")
 
@@ -519,85 +507,115 @@ Hãy tóm tắt những điểm khác biệt chính, bao gồm:
 
     @staticmethod
     def _build_circular_context(diff: dict) -> str:
-        """Build context string cho SLM từ kết quả phân tích"""
+        """Build context string cho SLM từ file coa_compare_99_vs_200.json"""
         lines = [
-            f"THỐNG KÊ:",
-            f"- Tổng số TK trong TT200: {diff['total_200']}",
-            f"- Tổng số TK trong TT99: {diff['total_99']}",
-            f"- Số TK mới: {len(diff['new_accounts'])}",
-            f"- Số TK bị xóa: {len(diff['removed_accounts'])}",
-            f"- Số TK đổi tên: {len(diff['renamed_accounts'])}",
+            "THỐNG KÊ THAY ĐỔI:",
+            f"- Tổng số thay đổi: {diff['total_changes']}",
+            f"- TK mới (ADDED): {len(diff['added'])}",
+            f"- TK bị xóa (REMOVED): {len(diff['removed'])}",
+            f"- TK đổi tên (RENAMED): {len(diff['renamed'])}",
+            f"- TK đổi tên + bỏ chi tiết: {len(diff['renamed_and_details_removed'])}",
+            f"- TK bỏ chi tiết cấp 2: {len(diff['details_removed'])}",
+            f"- TK thêm chi tiết: {len(diff['details_added'])}",
             ""
         ]
 
-        # Danh sách TK mới (max 10)
-        if diff['new_accounts']:
-            lines.append("TÀI KHOẢN MỚI (TT99):")
-            for acc in diff['new_accounts'][:10]:
-                lines.append(f"  - TK {acc['code']}: {acc['name']} ({acc['type_name']})")
-            if len(diff['new_accounts']) > 10:
-                lines.append(f"  ... và {len(diff['new_accounts']) - 10} TK khác")
+        # TK mới
+        if diff['added']:
+            lines.append("TÀI KHOẢN MỚI (ADDED):")
+            for item in diff['added']:
+                lines.append(f"  - {item['content']}")
             lines.append("")
 
-        # Danh sách TK bị xóa (max 10)
-        if diff['removed_accounts']:
-            lines.append("TÀI KHOẢN BỊ XÓA (không còn trong TT99):")
-            for acc in diff['removed_accounts'][:10]:
-                lines.append(f"  - TK {acc['code']}: {acc['name']} ({acc['type_name']})")
-            if len(diff['removed_accounts']) > 10:
-                lines.append(f"  ... và {len(diff['removed_accounts']) - 10} TK khác")
+        # TK bị xóa
+        if diff['removed']:
+            lines.append("TÀI KHOẢN BỊ XÓA (REMOVED):")
+            for item in diff['removed']:
+                lines.append(f"  - {item['content']}")
             lines.append("")
 
-        # Danh sách TK đổi tên (max 10)
-        if diff['renamed_accounts']:
-            lines.append("TÀI KHOẢN ĐỔI TÊN:")
-            for item in diff['renamed_accounts'][:10]:
-                lines.append(f"  - TK {item['code']}: \"{item['old_name']}\" → \"{item['new_name']}\"")
-            if len(diff['renamed_accounts']) > 10:
-                lines.append(f"  ... và {len(diff['renamed_accounts']) - 10} TK khác")
+        # TK đổi tên
+        if diff['renamed']:
+            lines.append("TÀI KHOẢN ĐỔI TÊN (RENAMED):")
+            for item in diff['renamed']:
+                lines.append(f"  - {item['content']}")
+            lines.append("")
+
+        # TK đổi tên + bỏ chi tiết
+        if diff['renamed_and_details_removed']:
+            lines.append("TÀI KHOẢN ĐỔI TÊN VÀ BỎ CHI TIẾT:")
+            for item in diff['renamed_and_details_removed']:
+                lines.append(f"  - {item['content']}")
+            lines.append("")
+
+        # TK bỏ chi tiết cấp 2
+        if diff['details_removed']:
+            lines.append("TÀI KHOẢN BỎ CHI TIẾT CẤP 2:")
+            for item in diff['details_removed']:
+                lines.append(f"  - {item['content']}")
+            lines.append("")
+
+        # TK thêm chi tiết
+        if diff['details_added']:
+            lines.append("TÀI KHOẢN THÊM CHI TIẾT:")
+            for item in diff['details_added']:
+                lines.append(f"  - {item['content']}")
 
         return "\n".join(lines)
 
     @staticmethod
     def _generate_circular_fallback(diff: dict) -> str:
-        """Fallback khi SLM không hoạt động"""
+        """Fallback khi SLM không hoạt động - sử dụng dữ liệu từ file compare"""
         lines = [
             "# SO SÁNH TỔNG QUAN: THÔNG TƯ 200/2014 vs THÔNG TƯ 99/2025",
             "",
-            "## 1. THỐNG KÊ CHUNG",
-            f"| Chỉ tiêu | TT200 (2014) | TT99 (2025) |",
-            f"|----------|--------------|-------------|",
-            f"| Tổng số tài khoản | {diff['total_200']} | {diff['total_99']} |",
-            f"| TK mới | - | {len(diff['new_accounts'])} |",
-            f"| TK bị xóa | {len(diff['removed_accounts'])} | - |",
-            f"| TK đổi tên | {len(diff['renamed_accounts'])} ||",
+            "## 1. THỐNG KÊ THAY ĐỔI",
+            f"| Loại thay đổi | Số lượng |",
+            f"|---------------|----------|",
+            f"| TK mới (ADDED) | {len(diff['added'])} |",
+            f"| TK bị xóa (REMOVED) | {len(diff['removed'])} |",
+            f"| TK đổi tên (RENAMED) | {len(diff['renamed'])} |",
+            f"| TK đổi tên + bỏ chi tiết | {len(diff['renamed_and_details_removed'])} |",
+            f"| TK bỏ chi tiết cấp 2 | {len(diff['details_removed'])} |",
+            f"| TK thêm chi tiết | {len(diff['details_added'])} |",
             ""
         ]
 
         # TK mới
-        if diff['new_accounts']:
+        if diff['added']:
             lines.append("## 2. TÀI KHOẢN MỚI TRONG TT99")
-            for acc in diff['new_accounts']:
-                lines.append(f"- **TK {acc['code']}**: {acc['name']} ({acc['type_name']})")
+            for item in diff['added']:
+                lines.append(f"- **TK {item['account_number']}**: {item['name_tt99']}")
+                lines.append(f"  {item['content']}")
             lines.append("")
 
         # TK bị xóa
-        if diff['removed_accounts']:
-            lines.append("## 3. TÀI KHOẢN BỊ XÓA (không còn trong TT99)")
-            for acc in diff['removed_accounts']:
-                lines.append(f"- **TK {acc['code']}**: {acc['name']} ({acc['type_name']})")
+        if diff['removed']:
+            lines.append("## 3. TÀI KHOẢN BỊ XÓA")
+            for item in diff['removed']:
+                lines.append(f"- **TK {item['account_number']}**: {item['name_tt200']}")
+                lines.append(f"  {item['content']}")
             lines.append("")
 
         # TK đổi tên
-        if diff['renamed_accounts']:
+        if diff['renamed']:
             lines.append("## 4. TÀI KHOẢN ĐỔI TÊN")
-            lines.append("| Mã TK | Tên cũ (TT200) | Tên mới (TT99) |")
-            lines.append("|-------|----------------|----------------|")
-            for item in diff['renamed_accounts']:
-                lines.append(f"| {item['code']} | {item['old_name']} | {item['new_name']} |")
+            for item in diff['renamed']:
+                lines.append(f"- **TK {item['account_number']}**: {item['name_tt200']} → {item['name_tt99']}")
             lines.append("")
 
-        lines.append("---")
-        lines.append("*(Dữ liệu được phân tích tự động từ Phụ lục II - TT99/2025/TT-BTC và TT200/2014/TT-BTC)*")
+        # TK đổi tên + bỏ chi tiết
+        if diff['renamed_and_details_removed']:
+            lines.append("## 5. TÀI KHOẢN ĐỔI TÊN VÀ BỎ CHI TIẾT")
+            for item in diff['renamed_and_details_removed']:
+                lines.append(f"- **TK {item['account_number']}**: {item['content']}")
+            lines.append("")
+
+        # TK bỏ chi tiết
+        if diff['details_removed']:
+            lines.append("## 6. TÀI KHOẢN BỎ CHI TIẾT CẤP 2")
+            for item in diff['details_removed']:
+                lines.append(f"- **TK {item['account_number']}**: {item['content']}")
+            lines.append("")
 
         return "\n".join(lines)

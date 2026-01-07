@@ -1,10 +1,16 @@
-#   Question → SLM classify
-#                 ↓
-#       ┌─────────┴─────────┬──────────┬────────────────┬──────────────────┬───────────────┐
-#       ↓                   ↓          ↓                ↓                  ↓               ↓
-#      COA           POSTING_ENGINE  COMPARE    COMPARE_CIRCULAR   GENERAL_ACCOUNTING  GENERAL_FREE
-#       ↓                   ↓          ↓                ↓                  ↓               ↓
-#    RagCOA.ask()    RagPE.ask()   compare()   compare_circular()    SLM (kế toán)    SLM (tự do)
+#                       ┌─────────────────┐
+#                       │   chat_type?    │
+#                       └────────┬────────┘
+#                 ┌──────────────┼──────────────┐
+#                 ↓                             ↓
+#            "thinking"                       "free"
+#                 ↓                             ↓
+#       ┌─────────────────┐           ┌─────────────────┐
+#       │ Chain-of-Thought│           │  Skip classify  │
+#       │  Classification │           │  Direct SLM     │
+#       └────────┬────────┘           └────────┬────────┘
+#                ↓                             ↓
+#       COA/POSTING/COMPARE/...         GENERAL_FREE
 
 import json
 import ollama
@@ -14,31 +20,54 @@ from app.core.config import settings
 from .rag_coa import RagCOA
 from .rag_posting_engine import RagPostingEngine
 from .history_manager import HISTORY_MANAGER
+from .stream_utils import stream_by_sentence
 
 # =============================================================================
 # RAG ROUTER
 # =============================================================================
 
-CLASSIFICATION_PROMPT = """Phân loại câu hỏi.
+CLASSIFICATION_PROMPT = """Phân loại câu hỏi kế toán. Hãy suy luận từng bước:
 
-POSTING_ENGINE: Hỏi về nghiệp vụ, cách hạch toán, định khoản, bút toán, quy trình (Ví dụ: "Bán hàng hạch toán sao?", "Nhập kho định khoản thế nào?")
-COA: Hỏi về thông tin tài khoản, tra cứu số TK, tên TK, bản chất tài khoản (Ví dụ: "TK 156 là gì?", "Tài khoản tiền mặt số mấy?")
-COMPARE: So sánh một tài khoản cụ thể giữa TT200 và TT99 - CẦN CÓ SỐ TÀI KHOẢN (Ví dụ: "So sánh TK 112 giữa TT200 và TT99", "TK 156 khác gì giữa 2 thông tư?")
-COMPARE_CIRCULAR: So sánh TỔNG QUAN giữa các thông tư, KHÔNG CÓ số tài khoản cụ thể (Ví dụ: "Điểm khác biệt giữa TT99 và TT200", "TT99 có gì mới so với TT200?")
-GENERAL_ACCOUNTING: Câu hỏi về kế toán nhưng KHÔNG thuộc các loại trên (Ví dụ: "Nguyên tắc kế toán là gì?", "Báo cáo tài chính gồm những gì?", "Khấu hao là gì?")
-GENERAL_FREE: Câu hỏi KHÔNG liên quan đến kế toán (Ví dụ: "Thời tiết hôm nay?", "Thủ đô Việt Nam là gì?", "Hello")
+BƯỚC 1: Câu hỏi có chứa số tài khoản (3-5 chữ số như 111, 112, 156, 331, 6421) không?
+BƯỚC 2: Câu hỏi có từ "so sánh", "khác gì", "khác nhau" không?
+BƯỚC 3: Dựa vào kết quả trên, phân loại:
+
+- Nếu CÓ số TK + CÓ từ so sánh → COMPARE (so sánh 1 TK cụ thể giữa TT200 và TT99)
+- Nếu KHÔNG có số TK + CÓ từ so sánh + nhắc đến thông tư → COMPARE_CIRCULAR (so sánh tổng quan 2 thông tư)
+- Nếu CÓ số TK + KHÔNG có từ so sánh → COA (tra cứu thông tin tài khoản)
+- Nếu hỏi về hạch toán, định khoản, bút toán, nghiệp vụ → POSTING_ENGINE
+- Nếu hỏi về kế toán chung (nguyên tắc, báo cáo, khái niệm) → GENERAL_ACCOUNTING
+- Nếu KHÔNG liên quan kế toán → GENERAL_FREE
+
+Ví dụ:
+- "So sánh TK 112" → Có số 112 + có "so sánh" → COMPARE
+- "TT99 khác gì TT200" → Không có số TK + có "khác gì" → COMPARE_CIRCULAR
+- "TK 156 là gì" → Có số 156 + không có so sánh → COA
+- "Bán hàng hạch toán sao" → Có "hạch toán" → POSTING_ENGINE
 
 Câu hỏi: {question}"""
 
 CLASSIFICATION_SCHEMA = {
     "type": "object",
     "properties": {
+        "reasoning": {
+            "type": "string",
+            "description": "Suy luận từng bước"
+        },
+        "has_account_number": {
+            "type": "boolean",
+            "description": "Câu hỏi có chứa số tài khoản không?"
+        },
+        "has_compare_keyword": {
+            "type": "boolean",
+            "description": "Câu hỏi có từ so sánh không?"
+        },
         "label": {
             "type": "string",
             "enum": ["COA", "POSTING_ENGINE", "COMPARE", "COMPARE_CIRCULAR", "GENERAL_ACCOUNTING", "GENERAL_FREE"]
         }
     },
-    "required": ["label"]
+    "required": ["reasoning", "has_account_number", "has_compare_keyword", "label"]
 }
 
 class RagRouter:
@@ -49,7 +78,7 @@ class RagRouter:
     @classmethod
     def classify(cls, question: str) -> str:
         """
-        Phân loại câu hỏi bằng SLM (structured output) hoặc Fallback Rule
+        Phân loại câu hỏi bằng SLM với Chain-of-Thought reasoning
         """
         print(f"[Router] Analyzing: {question}")
 
@@ -65,12 +94,21 @@ class RagRouter:
             )
             content = response.get("message", {}).get("content", "")
             result = json.loads(content)
-            label = result.get("label", "POSTING_ENGINE")
-            print(f"[Router] SLM Label: {label}")
+
+            # Log chain-of-thought reasoning
+            reasoning = result.get("reasoning", "")
+            has_account = result.get("has_account_number", False)
+            has_compare = result.get("has_compare_keyword", False)
+            label = result.get("label", "GENERAL_ACCOUNTING")
+
+            print(f"[Router] Reasoning: {reasoning}")
+            print(f"[Router] Has Account Number: {has_account}, Has Compare Keyword: {has_compare}")
+            print(f"[Router] Label: {label}")
+
             return label
 
         except Exception as e:
-            print(f"[Router] SLM Error: {e}. Using fallback rules.")
+            print(f"[Router] SLM Error: {e}. Using fallback.")
             return cls._fallback_classify(question)
 
     @classmethod
@@ -97,21 +135,24 @@ Trình bày rõ ràng, có cấu trúc, dễ hiểu."""
                 ],
                 stream=True
             )
-            for chunk in stream:
-                content = chunk.get("message", {}).get("content", "")
-                if content:
-                    yield content
+            # Yield theo câu để tránh lỗi encoding tiếng Việt
+            for sentence in stream_by_sentence(stream):
+                yield sentence
         except Exception as e:
             print(f"[GENERAL_ACCOUNTING Error] {e}")
             yield "Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại sau."
 
     @classmethod
     def _general_free_answer(cls, question: str):
-        """SLM trả lời câu hỏi tự do (không liên quan kế toán)"""
+        """SLM trả lời câu hỏi tự do - BUỘC trả lời bằng Tiếng Việt"""
         print(f"[GENERAL_FREE] Question: {question}")
 
-        system_prompt = """Bạn là trợ lý AI thông minh. LUÔN trả lời bằng TIẾNG VIỆT.
-Trả lời ngắn gọn, chính xác theo kiến thức của bạn."""
+        system_prompt = """Bạn là trợ lý AI thông minh.
+
+QUY TẮC BẮT BUỘC:
+- LUÔN LUÔN trả lời bằng TIẾNG VIỆT, không được dùng ngôn ngữ khác.
+- Dù người dùng hỏi bằng tiếng Anh hay ngôn ngữ khác, vẫn phải trả lời bằng Tiếng Việt.
+- Trả lời ngắn gọn, chính xác, dễ hiểu."""
 
         try:
             client = ollama.Client(host=settings.OLLAMA_HOST)
@@ -123,25 +164,37 @@ Trả lời ngắn gọn, chính xác theo kiến thức của bạn."""
                 ],
                 stream=True
             )
-            for chunk in stream:
-                content = chunk.get("message", {}).get("content", "")
-                if content:
-                    yield content
+            # Yield theo câu để tránh lỗi encoding tiếng Việt
+            for sentence in stream_by_sentence(stream):
+                yield sentence
         except Exception as e:
             print(f"[GENERAL_FREE Error] {e}")
             yield "Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại sau."
 
     @classmethod
-    def ask(cls, question: str, item_group: str = "GOODS", partner_group: str = "CUSTOMER"):
+    def ask(cls, question: str, item_group: str = "GOODS", partner_group: str = "CUSTOMER", chat_type: str = "thinking"):
         """
         Unified endpoint - API sẽ gọi hàm này.
+
+        chat_type:
+        - 'thinking': Phân loại thông minh (COA, POSTING_ENGINE, COMPARE, etc.)
+        - 'free': Chế độ tự do - SLM trả lời trực tiếp không qua phân loại
         """
-        # 1. Phân loại
+        full_response = ""
+
+        # Chế độ FREE: Bỏ qua phân loại, SLM trả lời tự do
+        if chat_type == "free":
+            print(f"[Router] Mode: FREE - Direct SLM answer")
+            for chunk in cls._general_free_answer(question):
+                full_response += chunk
+                yield chunk
+            HISTORY_MANAGER.add(question, full_response, "FREE")
+            return
+
+        # Chế độ THINKING: Phân loại thông minh
+        print(f"[Router] Mode: THINKING - Smart classification")
         category = cls.classify(question)
         print(f"[Router] Routing to -> {category}")
-
-        # 2. Điều hướng và thu thập response
-        full_response = ""
 
         if category == "COMPARE_CIRCULAR":
             for chunk in RagCOA.compare_circular(question):
