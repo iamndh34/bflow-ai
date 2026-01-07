@@ -1,7 +1,5 @@
 import json
 import os
-from datetime import datetime
-from typing import Optional
 from collections import defaultdict
 
 import numpy as np
@@ -10,6 +8,7 @@ import ollama
 from sentence_transformers import SentenceTransformer
 
 from app.core.config import settings
+from .history_manager import HISTORY_MANAGER
 
 # =============================================================================
 # CONFIG LOADING
@@ -357,65 +356,6 @@ class PostingEngineResolver:
 
 MINI_RAG_GRAPH = MiniRAGGraph()
 MINI_RAG_RETRIEVER = MiniRAGRetriever(MINI_RAG_GRAPH)
-
-
-class HistoryManager:
-    def __init__(self, max_history: int = 10):
-        self.max_history = max_history
-        self.history_file = os.path.join(BASE_DIR, "services", "rag_json", "conversation_history.json")
-        self.history = self._load_from_file()
-
-    def _load_from_file(self) -> list:
-        """Load lịch sử từ file JSON"""
-        try:
-            if os.path.exists(self.history_file):
-                with open(self.history_file, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    # Lấy 10 cái gần nhất
-                    return data[-self.max_history:] if len(data) > self.max_history else data
-        except Exception as e:
-            print(f"[Context] Error loading history: {e}")
-        return []
-
-    def _save_to_file(self):
-        """Lưu lịch sử ra file JSON"""
-        try:
-            with open(self.history_file, "w", encoding="utf-8") as f:
-                json.dump(self.history, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            print(f"[Context] Error saving history: {e}")
-
-    def add(self, question: str, response: str, category: str = "POSTING_ENGINE"):
-        """Thêm câu hỏi và câu trả lời vào lịch sử"""
-        self.history.append({
-            "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "question": question,
-            "response": response,
-            "category": category
-        })
-        # Giữ tối đa max_history items
-        if len(self.history) > self.max_history:
-            self.history = self.history[-self.max_history:]
-        # Lưu ra file
-        self._save_to_file()
-
-    def get_last_category(self) -> str:
-        """Lấy category của câu hỏi trước"""
-        return self.history[-1]["category"] if self.history else None
-
-    def reload(self):
-        """Reload lịch sử từ file"""
-        self.history = self._load_from_file()
-        print(f"[Context] Reloaded {len(self.history)} items")
-
-    def clear(self):
-        """Xóa lịch sử hội thoại"""
-        self.history = []
-        self._save_to_file()
-        print("[Context] Cleared")
-
-
-HISTORY_MANAGER = HistoryManager()
 
 
 class RagPostingEngine:
