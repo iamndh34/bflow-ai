@@ -1,16 +1,12 @@
-#                       ┌─────────────────┐
-#                       │   chat_type?    │
-#                       └────────┬────────┘
-#                 ┌──────────────┼──────────────┐
-#                 ↓                             ↓
-#            "thinking"                       "free"
-#                 ↓                             ↓
-#       ┌─────────────────┐           ┌─────────────────┐
-#       │ Chain-of-Thought│           │  Skip classify  │
-#       │  Classification │           │  Direct SLM     │
-#       └────────┬────────┘           └────────┬────────┘
-#                ↓                             ↓
-#       COA/POSTING/COMPARE/...         GENERAL_FREE
+#   | #   | Module             | Mô tả                                  | Log history     | Chat liền mạch |
+#   |-----|--------------------|----------------------------------------|-----------------|----------------|
+#   | 1   | COA                | Tra cứu thông tin tài khoản (có số TK) | ✅              | ❌             |
+#   | 2   | COMPARE            | So sánh 1 TK cụ thể giữa TT200 và TT99 | ✅              | ❌             |
+#   | 3   | COMPARE_CIRCULAR   | So sánh tổng quan 2 thông tư           | ✅              | ❌             |
+#   | 4   | POSTING_ENGINE     | Hạch toán, định khoản, bút toán        | ✅              | ❌             |
+#   | 5   | GENERAL_ACCOUNTING | Câu hỏi kế toán tổng quát              | ✅              | ✅             |
+#   | 6   | GENERAL_FREE       | Câu hỏi không liên quan kế toán        | ✅              | ✅             |
+#   | 7   | FREE (mode)        | Chế độ tự do, bỏ qua phân loại         | ✅ (file riêng) | ✅             |
 
 import json
 import ollama
@@ -127,7 +123,7 @@ Trình bày rõ ràng, có cấu trúc, dễ hiểu."""
 
         try:
             client = ollama.Client(host=settings.OLLAMA_HOST)
-            # Xây dựng messages với history để chat liền mạch
+            # Đưa toàn bộ history vào để chat liền mạch
             messages = [{"role": "system", "content": system_prompt}]
             messages.extend(HISTORY_MANAGER.get_messages_format())
             messages.append({"role": "user", "content": question})
@@ -161,7 +157,7 @@ QUY TẮC BẮT BUỘC:
 
         try:
             client = ollama.Client(host=settings.OLLAMA_HOST)
-            # Xây dựng messages với history để chat liền mạch
+            # Đưa toàn bộ history vào để chat liền mạch
             messages = [{"role": "system", "content": system_prompt}]
             messages.extend(hm.get_messages_format())
             messages.append({"role": "user", "content": question})

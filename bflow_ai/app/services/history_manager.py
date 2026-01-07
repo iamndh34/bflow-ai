@@ -56,10 +56,6 @@ class HistoryManager:
             messages.append({"role": "assistant", "content": item["response"]})
         return messages
 
-    def get_last_category(self) -> str:
-        """Lấy category của câu hỏi trước"""
-        return self.history[-1]["category"] if self.history else None
-
     def reload(self):
         """Reload lịch sử từ file"""
         self.history = self._load_from_file()
