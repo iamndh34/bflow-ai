@@ -43,6 +43,6 @@ async def get_history():
 
 @router.post("/posting-engine/reset_history")
 async def reset_history():
-    """Xóa lịch sử hội thoại (xóa file JSON)"""
+    """Xóa 10 câu hỏi gần nhất, giữ lại phần còn lại"""
     RagRouter.reset_history()
-    return {"message": "History cleared"}
+    return {"message": "10 recent items cleared"}

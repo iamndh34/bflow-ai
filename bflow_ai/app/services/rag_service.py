@@ -238,11 +238,11 @@ QUY TẮC BẮT BUỘC:
 
     @staticmethod
     def get_history():
-        """Get current history"""
-        return HISTORY_MANAGER.history
+        """Get 10 câu hỏi gần nhất"""
+        return HISTORY_MANAGER.get_recent()
 
     @staticmethod
     def reload_history():
-        """Reload history từ file JSON"""
+        """Reload history từ file JSON và trả về 10 câu gần nhất"""
         HISTORY_MANAGER.reload()
-        return HISTORY_MANAGER.history
+        return HISTORY_MANAGER.get_recent()
