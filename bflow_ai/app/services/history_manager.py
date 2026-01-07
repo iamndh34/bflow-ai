@@ -6,9 +6,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class HistoryManager:
-    def __init__(self, max_history: int = 10):
+    def __init__(self, max_history: int = 10, filename: str = "conversation_history.json"):
         self.max_history = max_history
-        self.history_file = os.path.join(BASE_DIR, "services", "rag_json", "conversation_history.json")
+        self.history_file = os.path.join(BASE_DIR, "services", "rag_json", filename)
         self.history = self._load_from_file()
 
     def _load_from_file(self) -> list:
@@ -44,6 +44,18 @@ class HistoryManager:
         n = count if count is not None else self.max_history
         return self.history[-n:] if len(self.history) > n else self.history
 
+    def get_messages_format(self, count: int = None) -> list:
+        """
+        Chuyển history thành format messages cho Ollama.
+        Trả về list các message với role 'user' và 'assistant'.
+        """
+        recent = self.get_recent(count)
+        messages = []
+        for item in recent:
+            messages.append({"role": "user", "content": item["question"]})
+            messages.append({"role": "assistant", "content": item["response"]})
+        return messages
+
     def get_last_category(self) -> str:
         """Lấy category của câu hỏi trước"""
         return self.history[-1]["category"] if self.history else None
@@ -64,5 +76,6 @@ class HistoryManager:
         print(f"[HistoryManager] Cleared {n} recent items, {len(self.history)} remaining")
 
 
-# Singleton instance
-HISTORY_MANAGER = HistoryManager()
+# Singleton instances
+HISTORY_MANAGER = HistoryManager()  # Cho các module: COA, POSTING_ENGINE, COMPARE, GENERAL_ACCOUNTING, GENERAL_FREE
+FREE_HISTORY_MANAGER = HistoryManager(filename="free_conversation_history.json")  # Riêng cho FREE mode

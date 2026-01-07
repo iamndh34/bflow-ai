@@ -32,9 +32,11 @@ async def ask_accounting(
 
 
 @router.get("/posting-engine/get_history")
-async def get_history():
+async def get_history(
+    chat_type: str = Query("thinking", description="Chế độ: 'thinking' hoặc 'free'")
+):
     """Lấy lịch sử hội thoại (reload từ file JSON, 10 câu gần nhất)"""
-    history = RagRouter.reload_history()
+    history = RagRouter.reload_history(chat_type=chat_type)
     return {
         "count": len(history),
         "history": history
@@ -42,7 +44,9 @@ async def get_history():
 
 
 @router.post("/posting-engine/reset_history")
-async def reset_history():
+async def reset_history(
+    chat_type: str = Query("thinking", description="Chế độ: 'thinking' hoặc 'free'")
+):
     """Xóa 10 câu hỏi gần nhất, giữ lại phần còn lại"""
-    RagRouter.reset_history()
+    RagRouter.reset_history(chat_type=chat_type)
     return {"message": "10 recent items cleared"}

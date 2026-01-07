@@ -19,7 +19,7 @@ from app.core.config import settings
 # Import modules
 from .rag_coa import RagCOA
 from .rag_posting_engine import RagPostingEngine
-from .history_manager import HISTORY_MANAGER
+from .history_manager import HISTORY_MANAGER, FREE_HISTORY_MANAGER
 from .stream_utils import stream_by_sentence
 
 # =============================================================================
@@ -127,12 +127,14 @@ Trình bày rõ ràng, có cấu trúc, dễ hiểu."""
 
         try:
             client = ollama.Client(host=settings.OLLAMA_HOST)
+            # Xây dựng messages với history để chat liền mạch
+            messages = [{"role": "system", "content": system_prompt}]
+            messages.extend(HISTORY_MANAGER.get_messages_format())
+            messages.append({"role": "user", "content": question})
+
             stream = client.chat(
                 model="qwen2.5:3b",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": question}
-                ],
+                messages=messages,
                 stream=True
             )
             # Yield theo câu để tránh lỗi encoding tiếng Việt
@@ -143,9 +145,12 @@ Trình bày rõ ràng, có cấu trúc, dễ hiểu."""
             yield "Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại sau."
 
     @classmethod
-    def _general_free_answer(cls, question: str):
+    def _general_free_answer(cls, question: str, history_manager=None):
         """SLM trả lời câu hỏi tự do - BUỘC trả lời bằng Tiếng Việt"""
         print(f"[GENERAL_FREE] Question: {question}")
+
+        # Sử dụng history manager được chỉ định, mặc định là HISTORY_MANAGER
+        hm = history_manager if history_manager else HISTORY_MANAGER
 
         system_prompt = """Bạn là trợ lý AI thông minh.
 
@@ -156,12 +161,14 @@ QUY TẮC BẮT BUỘC:
 
         try:
             client = ollama.Client(host=settings.OLLAMA_HOST)
+            # Xây dựng messages với history để chat liền mạch
+            messages = [{"role": "system", "content": system_prompt}]
+            messages.extend(hm.get_messages_format())
+            messages.append({"role": "user", "content": question})
+
             stream = client.chat(
                 model="qwen2.5:3b",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": question}
-                ],
+                messages=messages,
                 stream=True
             )
             # Yield theo câu để tránh lỗi encoding tiếng Việt
@@ -182,13 +189,13 @@ QUY TẮC BẮT BUỘC:
         """
         full_response = ""
 
-        # Chế độ FREE: Bỏ qua phân loại, SLM trả lời tự do
+        # Chế độ FREE: Bỏ qua phân loại, SLM trả lời tự do (dùng history riêng)
         if chat_type == "free":
             print(f"[Router] Mode: FREE - Direct SLM answer")
-            for chunk in cls._general_free_answer(question):
+            for chunk in cls._general_free_answer(question, history_manager=FREE_HISTORY_MANAGER):
                 full_response += chunk
                 yield chunk
-            HISTORY_MANAGER.add(question, full_response, "FREE")
+            FREE_HISTORY_MANAGER.add(question, full_response, "FREE")
             return
 
         # Chế độ THINKING: Phân loại thông minh
@@ -232,17 +239,25 @@ QUY TẮC BẮT BUỘC:
             HISTORY_MANAGER.add(question, full_response, "GENERAL_FREE")
 
     @staticmethod
-    def reset_history():
-        """Reset history (xóa file JSON)"""
-        HISTORY_MANAGER.clear()
+    def reset_history(chat_type: str = "thinking"):
+        """Reset history (xóa 10 câu gần nhất)"""
+        if chat_type == "free":
+            FREE_HISTORY_MANAGER.clear()
+        else:
+            HISTORY_MANAGER.clear()
 
     @staticmethod
-    def get_history():
+    def get_history(chat_type: str = "thinking"):
         """Get 10 câu hỏi gần nhất"""
+        if chat_type == "free":
+            return FREE_HISTORY_MANAGER.get_recent()
         return HISTORY_MANAGER.get_recent()
 
     @staticmethod
-    def reload_history():
+    def reload_history(chat_type: str = "thinking"):
         """Reload history từ file JSON và trả về 10 câu gần nhất"""
+        if chat_type == "free":
+            FREE_HISTORY_MANAGER.reload()
+            return FREE_HISTORY_MANAGER.get_recent()
         HISTORY_MANAGER.reload()
         return HISTORY_MANAGER.get_recent()
