@@ -16,6 +16,7 @@ from app.core.config import settings
 from .rag_coa import RagCOA
 from .rag_posting_engine import RagPostingEngine
 from .history_manager import HISTORY_MANAGER, FREE_HISTORY_MANAGER
+from .session_manager import get_session_manager
 from .stream_utils import stream_by_sentence
 
 # =============================================================================
@@ -113,7 +114,7 @@ class RagRouter:
         return "GENERAL_ACCOUNTING"
 
     @classmethod
-    def _general_accounting_answer(cls, question: str):
+    def _general_accounting_answer(cls, question: str, session_manager=None, session_id: str = None):
         """SLM trả lời câu hỏi kế toán tổng quát (dựa trên kiến thức SLM)"""
         print(f"[GENERAL_ACCOUNTING] Question: {question}")
 
@@ -125,7 +126,10 @@ Trình bày rõ ràng, có cấu trúc, dễ hiểu."""
             client = ollama.Client(host=settings.OLLAMA_HOST)
             # Đưa toàn bộ history vào để chat liền mạch
             messages = [{"role": "system", "content": system_prompt}]
-            messages.extend(HISTORY_MANAGER.get_messages_format())
+            if session_manager and session_id:
+                messages.extend(session_manager.get_messages_format(session_id))
+            else:
+                messages.extend(HISTORY_MANAGER.get_messages_format())
             messages.append({"role": "user", "content": question})
 
             stream = client.chat(
@@ -141,12 +145,9 @@ Trình bày rõ ràng, có cấu trúc, dễ hiểu."""
             yield "Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại sau."
 
     @classmethod
-    def _general_free_answer(cls, question: str, history_manager=None):
+    def _general_free_answer(cls, question: str, session_manager=None, session_id: str = None):
         """SLM trả lời câu hỏi tự do - BUỘC trả lời bằng Tiếng Việt"""
         print(f"[GENERAL_FREE] Question: {question}")
-
-        # Sử dụng history manager được chỉ định, mặc định là HISTORY_MANAGER
-        hm = history_manager if history_manager else HISTORY_MANAGER
 
         system_prompt = """Bạn là trợ lý AI thông minh.
 
@@ -159,7 +160,10 @@ QUY TẮC BẮT BUỘC:
             client = ollama.Client(host=settings.OLLAMA_HOST)
             # Đưa toàn bộ history vào để chat liền mạch
             messages = [{"role": "system", "content": system_prompt}]
-            messages.extend(hm.get_messages_format())
+            if session_manager and session_id:
+                messages.extend(session_manager.get_messages_format(session_id))
+            else:
+                messages.extend(HISTORY_MANAGER.get_messages_format())
             messages.append({"role": "user", "content": question})
 
             stream = client.chat(
@@ -175,23 +179,36 @@ QUY TẮC BẮT BUỘC:
             yield "Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại sau."
 
     @classmethod
-    def ask(cls, question: str, item_group: str = "GOODS", partner_group: str = "CUSTOMER", chat_type: str = "thinking"):
+    def ask(cls, question: str, item_group: str = "GOODS", partner_group: str = "CUSTOMER", chat_type: str = "thinking", session_id: str = None):
         """
         Unified endpoint - API sẽ gọi hàm này.
 
         chat_type:
         - 'thinking': Phân loại thông minh (COA, POSTING_ENGINE, COMPARE, etc.)
         - 'free': Chế độ tự do - SLM trả lời trực tiếp không qua phân loại
+
+        session_id: ID của session, nếu không có sẽ tạo mới
         """
         full_response = ""
 
-        # Chế độ FREE: Bỏ qua phân loại, SLM trả lời tự do (dùng history riêng)
+        # Lấy session manager theo chat_type
+        sm = get_session_manager(chat_type)
+
+        # Tạo session mới nếu chưa có
+        if not session_id:
+            session_id = sm.create_session()
+            print(f"[Router] Created new session: {session_id}")
+
+        # Yield session_id đầu tiên để frontend biết
+        yield f"__SESSION_ID__:{session_id}\n"
+
+        # Chế độ FREE: Bỏ qua phân loại, SLM trả lời tự do
         if chat_type == "free":
             print(f"[Router] Mode: FREE - Direct SLM answer")
-            for chunk in cls._general_free_answer(question, history_manager=FREE_HISTORY_MANAGER):
+            for chunk in cls._general_free_answer(question, session_manager=sm, session_id=session_id):
                 full_response += chunk
                 yield chunk
-            FREE_HISTORY_MANAGER.add(question, full_response, "FREE")
+            sm.add_message(session_id, question, full_response, "FREE")
             return
 
         # Chế độ THINKING: Phân loại thông minh
@@ -203,36 +220,38 @@ QUY TẮC BẮT BUỘC:
             for chunk in RagCOA.compare_circular(question):
                 full_response += chunk
                 yield chunk
-            HISTORY_MANAGER.add(question, full_response, "COMPARE_CIRCULAR")
+            sm.add_message(session_id, question, full_response, "COMPARE_CIRCULAR")
 
         elif category == "COMPARE":
             for chunk in RagCOA.compare(question):
                 full_response += chunk
                 yield chunk
-            HISTORY_MANAGER.add(question, full_response, "COMPARE")
+            sm.add_message(session_id, question, full_response, "COMPARE")
 
         elif category == "COA":
             for chunk in RagCOA.ask(question):
                 full_response += chunk
                 yield chunk
-            HISTORY_MANAGER.add(question, full_response, "COA")
+            sm.add_message(session_id, question, full_response, "COA")
 
         elif category == "POSTING_ENGINE":
             for chunk in RagPostingEngine.ask(question, item_group, partner_group):
-                yield chunk
-
-        elif category == "GENERAL_ACCOUNTING":
-            for chunk in cls._general_accounting_answer(question):
                 full_response += chunk
                 yield chunk
-            HISTORY_MANAGER.add(question, full_response, "GENERAL_ACCOUNTING")
+            sm.add_message(session_id, question, full_response, "POSTING_ENGINE")
+
+        elif category == "GENERAL_ACCOUNTING":
+            for chunk in cls._general_accounting_answer(question, session_manager=sm, session_id=session_id):
+                full_response += chunk
+                yield chunk
+            sm.add_message(session_id, question, full_response, "GENERAL_ACCOUNTING")
 
         else:
             # GENERAL_FREE: SLM trả lời tự do
-            for chunk in cls._general_free_answer(question):
+            for chunk in cls._general_free_answer(question, session_manager=sm, session_id=session_id):
                 full_response += chunk
                 yield chunk
-            HISTORY_MANAGER.add(question, full_response, "GENERAL_FREE")
+            sm.add_message(session_id, question, full_response, "GENERAL_FREE")
 
     @staticmethod
     def reset_history(chat_type: str = "thinking"):
