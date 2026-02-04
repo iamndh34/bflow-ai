@@ -147,17 +147,77 @@ class GeneralFreeAgent(BaseAgent):
         return "Trợ lý AI thông minh. Trả lời các câu hỏi tự do, không liên quan kế toán."
 
     def can_handle(self, context: AgentContext) -> tuple[bool, float]:
-        """Luôn có thể xử lý (fallback cuối cùng)"""
-        return True, 0.1
+        """
+        Kiểm tra agent có thể xử lý query không.
+
+        Dùng LLM để phân loại: Accounting vs General chat.
+        """
+        # Gọi LLM phân loại (lightweight, nhanh)
+        is_general = self._is_general_chat(context.question)
+
+        if is_general:
+            # General chat - confidence cao
+            return True, 0.95
+
+        # Fallback - confidence thấp nhất
+        return True, 0.05
+
+    def _is_general_chat(self, question: str) -> bool:
+        """
+        Dùng LLM nhỏ để phân loại câu hỏi có phải general chat không.
+
+        Trả về True nếu là general chat, False nếu liên quan kế toán.
+        """
+        from ..core.ollama_client import get_ollama_client
+        from ..core.config import settings
+
+        client = get_ollama_client()
+
+        prompt = f"""Phân loại câu hỏi sau. CHỈ TRẢ VỀ "YES" hoặc "NO".
+
+Câu hỏi: {question}
+
+YES nếu:
+- Chat xã giao, chào hỏi, cảm ơn, hỏi thăm sức khỏe
+- Không liên quan đến kế toán, tài khoản, hạch toán
+- Câu hỏi đời sống, tình cảm, sở thích
+
+NO nếu:
+- Hỏi về kế toán, tài khoản, hạch toán, báo cáo tài chính
+- Hỏi về nghiệp vụ kế toán
+- Chứa từ khóa chuyên ngành kế toán
+
+Chỉ trả: YES hoặc NO"""
+
+        try:
+            response = client.chat(
+                model=settings.CLASSIFIER_MODEL,  # qwen2.5:0.5b - nhanh
+                messages=[{"role": "user", "content": prompt}],
+                options={"num_predict": 3, "temperature": 0},  # Chỉ cần YES/NO
+                stream=False
+            )
+
+            result = response.get("message", {}).get("content", "").strip().upper()
+
+            print(f"[GeneralFreeAgent] LLM classification: {result} for question: {question[:50]}...")
+
+            return "YES" in result
+
+        except Exception as e:
+            print(f"[GeneralFreeAgent] Classification error: {e}")
+            # Fallback: nếu LLM fail, assume general (an toàn hơn)
+            return True
 
     def execute(self, context: AgentContext) -> AgentResult:
         """Thực thi query"""
-        system_prompt = """Bạn là trợ lý AI thông minh.
+        system_prompt = """Bạn là trợ lý AI thông minh và thân thiện.
 
 QUY TẮC BẮT BUỘC:
 - LUÔN LUÔN trả lời bằng TIẾNG VIỆT, không được dùng ngôn ngữ khác.
 - Dù người dùng hỏi bằng tiếng Anh hay ngôn ngữ khác, vẫn phải trả lời bằng Tiếng Việt.
-- Trả lời ngắn gọn, chính xác, dễ hiểu."""
+- Trả lời ngắn gọn, chính xác, dễ hiểu.
+- Khi người dùng chat xã giao (mệt, cảm ơn, xin chào...), hãy phản hồi một cách tự nhiên, thân thiện như một người bạn.
+- Nếu người dùng hỏi về kế toán, hãy hướng dẫn họ dùng các câu hỏi cụ thể hơn."""
 
         try:
             client = get_ollama_client()
@@ -191,12 +251,14 @@ QUY TẮC BẮT BUỘC:
 
     def stream_execute(self, context: AgentContext):
         """Execute với streaming response"""
-        system_prompt = """Bạn là trợ lý AI thông minh.
+        system_prompt = """Bạn là trợ lý AI thông minh và thân thiện.
 
 QUY TẮC BẮT BUỘC:
 - LUÔN LUÔN trả lời bằng TIẾNG VIỆT, không được dùng ngôn ngữ khác.
 - Dù người dùng hỏi bằng tiếng Anh hay ngôn ngữ khác, vẫn phải trả lời bằng Tiếng Việt.
-- Trả lời ngắn gọn, chính xác, dễ hiểu."""
+- Trả lời ngắn gọn, chính xác, dễ hiểu.
+- Khi người dùng chat xã giao (mệt, cảm ơn, xin chào...), hãy phản hồi một cách tự nhiên, thân thiện như một người bạn.
+- Nếu người dùng hỏi về kế toán, hãy hướng dẫn họ dùng các câu hỏi cụ thể hơn."""
 
         try:
             client = get_ollama_client()

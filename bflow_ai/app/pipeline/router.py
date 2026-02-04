@@ -246,12 +246,33 @@ class ModuleRouter:
         pipeline = self._get_pipeline(module_code)
 
         if pipeline is None:
-            # Module GENERAL - xử lý trực tiếp
-            print("[ModuleRouter] General mode - using simple response")
-            response = self._get_general_response(question)
-            for char in response:
-                yield char
-            return
+            # Module GENERAL - gọi GeneralFreeAgent
+            print("[ModuleRouter] General mode - calling GeneralFreeAgent")
+            from ..agents.orchestrator import get_orchestrator
+
+            orchestrator = get_orchestrator()
+            agent = orchestrator.get_agent("GENERAL_FREE")
+
+            if agent:
+                from ..agents.base import AgentContext
+                context = AgentContext(
+                    question=question,
+                    session_id=session_id or "",
+                    chat_type=chat_type or "thinking",
+                    item_group=item_group or "GOODS",
+                    partner_group=partner_group or "CUSTOMER",
+                    history=[]
+                )
+
+                for chunk in agent.stream_execute(context):
+                    yield chunk
+                return
+            else:
+                # Fallback nếu không có agent
+                response = self._get_general_response(question)
+                for char in response:
+                    yield char
+                return
 
         # Step 3: Process qua pipeline
         for chunk in pipeline.process(
