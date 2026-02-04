@@ -24,6 +24,17 @@ class Settings(BaseSettings):
         "num_thread": 4,          # CPU cores
     }
 
+    # Options cho GeneralFreeAgent - temperature cao hơn để tự nhiên hơn
+    GENERAL_FREE_OPTIONS: dict = {
+        "num_ctx": 4096,          # Context nhỏ hơn cho chat
+        "num_predict": 2048,      # Tăng lên để response dài hơn, chi tiết hơn
+        "temperature": 0.75,      # Cao hơn để tự nhiên, sáng tạo
+        "top_p": 0.9,             # Tăng để đa dạng hơn
+        "top_k": 40,              # Tăng để nhiều lựa chọn hơn
+        "repeat_penalty": 1.1,    # Giảm để cho phép lặp lại trong chat
+        "num_thread": 4,
+    }
+
     # Redis Configuration
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379

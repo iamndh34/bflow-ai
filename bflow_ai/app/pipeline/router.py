@@ -255,13 +255,29 @@ class ModuleRouter:
 
             if agent:
                 from ..agents.base import AgentContext
+                from ..services.session_manager import get_session_manager
+
+                # Load history từ session
+                sm = get_session_manager(chat_type or "thinking")
+                history_data = sm.get_history(session_id or "", max_count=10) if session_id else []
+
+                # Convert history sang format cho AgentContext
+                history = []
+                if history_data:
+                    for item in history_data:
+                        if item.get("role") == "user":
+                            history.append({"role": "user", "content": item.get("content", "")})
+                        elif item.get("role") == "assistant":
+                            history.append({"role": "assistant", "content": item.get("content", "")})
+
                 context = AgentContext(
                     question=question,
                     session_id=session_id or "",
                     chat_type=chat_type or "thinking",
                     item_group=item_group or "GOODS",
                     partner_group=partner_group or "CUSTOMER",
-                    history=[]
+                    history=history,
+                    skip_cache=True  # GENERAL_FREE không dùng cache
                 )
 
                 for chunk in agent.stream_execute(context):

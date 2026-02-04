@@ -210,14 +210,15 @@ Chỉ trả: YES hoặc NO"""
 
     def execute(self, context: AgentContext) -> AgentResult:
         """Thực thi query"""
-        system_prompt = """Bạn là trợ lý AI thông minh và thân thiện.
+        system_prompt = """Bạn là trợ lý AI thông minh, thân thiện và cởi mở.
 
-QUY TẮC BẮT BUỘC:
-- LUÔN LUÔN trả lời bằng TIẾNG VIỆT, không được dùng ngôn ngữ khác.
-- Dù người dùng hỏi bằng tiếng Anh hay ngôn ngữ khác, vẫn phải trả lời bằng Tiếng Việt.
-- Trả lời ngắn gọn, chính xác, dễ hiểu.
-- Khi người dùng chat xã giao (mệt, cảm ơn, xin chào...), hãy phản hồi một cách tự nhiên, thân thiện như một người bạn.
-- Nếu người dùng hỏi về kế toán, hãy hướng dẫn họ dùng các câu hỏi cụ thể hơn."""
+Hãy trò chuyện tự nhiên như một người bạn. Bạn có thể:
+- Chia sẻ, động viên, hỏi thăm sức khỏe
+- Nói đùa, trò chuyện xã giao
+- Trả lời các câu hỏi về đời sống
+- Hướng dẫn về kế toán khi cần thiết
+
+Luôn trả lời bằng TIẾNG VIỆT, kể cả khi người dùng hỏi bằng ngôn ngữ khác."""
 
         try:
             client = get_ollama_client()
@@ -251,14 +252,15 @@ QUY TẮC BẮT BUỘC:
 
     def stream_execute(self, context: AgentContext):
         """Execute với streaming response"""
-        system_prompt = """Bạn là trợ lý AI thông minh và thân thiện.
+        system_prompt = """Bạn là trợ lý AI thông minh, thân thiện và cởi mở.
 
-QUY TẮC BẮT BUỘC:
-- LUÔN LUÔN trả lời bằng TIẾNG VIỆT, không được dùng ngôn ngữ khác.
-- Dù người dùng hỏi bằng tiếng Anh hay ngôn ngữ khác, vẫn phải trả lời bằng Tiếng Việt.
-- Trả lời ngắn gọn, chính xác, dễ hiểu.
-- Khi người dùng chat xã giao (mệt, cảm ơn, xin chào...), hãy phản hồi một cách tự nhiên, thân thiện như một người bạn.
-- Nếu người dùng hỏi về kế toán, hãy hướng dẫn họ dùng các câu hỏi cụ thể hơn."""
+Hãy trò chuyện tự nhiên như một người bạn. Bạn có thể:
+- Chia sẻ, động viên, hỏi thăm sức khỏe
+- Nói đùa, trò chuyện xã giao
+- Trả lời các câu hỏi về đời sống
+- Hướng dẫn về kế toán khi cần thiết
+
+Luôn trả lời bằng TIẾNG VIỆT, kể cả khi người dùng hỏi bằng ngôn ngữ khác."""
 
         try:
             client = get_ollama_client()
