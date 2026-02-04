@@ -1,34 +1,54 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from motor.motor_asyncio import AsyncIOMotorClient
-from app.core.config import settings
-from app.db.mongodb import db
-from app.api.endpoints.accounting import router
+from app.api.endpoints.ask import router as unified_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.db.mongodb import close_mongo_connection
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Kết nối DB
-    db.client = AsyncIOMotorClient(settings.MONGO_URL)
-    print("Connected to MongoDB")
+    # Startup
     yield
-    # Shutdown: Đóng kết nối
-    db.client.close()
-    print("Disconnected MongoDB")
+    # Shutdown - đóng MongoDB connection
+    await close_mongo_connection()
 
-app = FastAPI(title="BFLOW AI", lifespan=lifespan)
+
+app = FastAPI(
+    title="BFLOW AI",
+    description="Unified Multi-Module AI Assistant - Pipeline Architecture",
+    version="1.0",
+    lifespan=lifespan
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],        # Để trống
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(router, prefix="/api/ai-bflow")
+# Include unified endpoint
+app.include_router(unified_router, prefix="/api/ai-bflow")
+
 
 @app.get("/")
 async def root():
-    return {"message": "BFLOW AI is running"}
+    return {
+        "message": "BFLOW AI - Unified Multi-Module Architecture",
+        "endpoints": {
+            "unified": "/api/ai-bflow/ask",
+            "description": "Single endpoint for all modules (Accounting, HR, CRM, etc)"
+        },
+        "modules": [
+            "ACCOUNTING - Kế toán, tài khoản, hạch toán",
+            "GENERAL - Câu hỏi chung"
+        ],
+        "features": [
+            "Module Router - Auto route to appropriate module",
+            "Hybrid Semantic History Matching",
+            "Streaming Cache with Simulation",
+            "Multi-Agent System",
+            "Optimized Vector Search"
+        ]
+    }

@@ -8,17 +8,31 @@ services:
     ports:
       - "8010:8010"
     env_file:
-      - .env
+      - .env.development
     depends_on:
-      - mongo
-      - ollama  # <--- Đợi cả Ollama chạy xong mới chạy app
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_started
     restart: unless-stopped
     environment:
       - MONGO_URL=mongodb://mis_mongo:27017/bflow_db
-      - OLLAMA_HOST=http://mis_ollama:11434  # <--- Dòng này giúp code Python tự biết đường tìm AI
+      - OLLAMA_HOST=http://mis_ollama:11434
+      - REDIS_HOST=mis_redis
+      - REDIS_PORT=6379
       - PYTHONUNBUFFERED=1
+    networks:
+      - bflow_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
-  # 2. Database (Đã có)
+  # 2. Database MongoDB
   mongo:
     image: mongo:6.0
     container_name: mis_mongo
@@ -27,18 +41,50 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - bflow_network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # 3. AI Server (THÊM MỚI ĐOẠN NÀY)
+  # 3. AI Server Ollama
   ollama:
     image: ollama/ollama:latest
     container_name: mis_ollama
     restart: always
     ports:
-      - "11434:11434" # Mở port này để bạn có thể test từ máy ngoài nếu cần
+      - "11434:11434"
     volumes:
-      - ollama_data:/root/.ollama # Quan trọng: Lưu model lại để không phải tải lại mỗi lần restart
+      - ollama_data:/root/.ollama
+    networks:
+      - bflow_network
+
+  # 4. Redis Cache (THÊM MỚI)
+  redis:
+    image: redis:7-alpine
+    container_name: mis_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - bflow_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# Networks
+networks:
+  bflow_network:
+    driver: bridge
 
 # Khai báo Volumes
 volumes:
   mongodb_data:
-  ollama_data: # <--- Thêm dòng này
+  ollama_data:
+  redis_data:

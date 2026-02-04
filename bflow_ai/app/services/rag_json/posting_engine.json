@@ -16,9 +16,9 @@
       "module_id": 0,
       "transaction_key": "SALES_INVOICE",
       "django_model": "arinvoice.arinvoice",
-      "description": "Hóa đơn phải thu - ghi nhận công nợ phải thu khách hàng, thuế GTGT đầu ra và đối trừ với phiếu xuất kho",
+      "description": "Hóa đơn đầu ra - ghi nhận công nợ phải thu khách hàng, thuế GTGT đầu ra và đối trừ với phiếu xuất kho",
       "keywords": [
-        "hóa đơn bán hàng", "hóa đơn đầu ra", "hóa đơn phải thu", "xuất hóa đơn cho khách", "lập hóa đơn bán",
+        "hóa đơn bán hàng", "hóa đơn đầu ra", "hóa đơn đầu ra", "xuất hóa đơn cho khách", "lập hóa đơn bán",
         "công nợ phải thu", "thuế đầu ra", "VAT đầu ra",
         "hóa đơn GTGT bán ra", "AR invoice", "ghi nợ khách hàng"
       ],
@@ -52,9 +52,9 @@
       "module_id": 1,
       "transaction_key": "PURCHASE_INVOICE",
       "django_model": "apinvoice.apinvoice",
-      "description": "Hóa đơn phải chi - ghi nhận công nợ phải trả nhà cung cấp, thuế GTGT đầu vào và đối trừ với phiếu nhập kho",
+      "description": "Hóa đơn đầu vào - ghi nhận công nợ phải trả nhà cung cấp, thuế GTGT đầu vào và đối trừ với phiếu nhập kho",
       "keywords": [
-        "hóa đơn mua hàng", "hóa đơn đầu vào", "hóa đơn phải chi", "nhận hóa đơn từ NCC", "hóa đơn nhà cung cấp",
+        "hóa đơn mua hàng", "hóa đơn đầu vào", "hóa đơn đầu vào", "nhận hóa đơn từ NCC", "hóa đơn nhà cung cấp",
         "công nợ phải trả", "thuế đầu vào", "VAT đầu vào",
         "hóa đơn GTGT mua vào", "AP invoice", "ghi nợ nhà cung cấp"
       ],
