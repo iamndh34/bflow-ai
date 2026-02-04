@@ -15,12 +15,12 @@ class Settings(BaseSettings):
 
     # Ollama generation options
     OLLAMA_OPTIONS: dict = {
-        "num_ctx": 2048,          # Context window
-        "num_predict": 512,       # Max tokens prediction
-        "temperature": 0.3,       # Deterministic output
-        "top_p": 0.9,
-        "top_k": 40,
-        "repeat_penalty": 1.1,
+        "num_ctx": 8192,          # Context window lớn
+        "num_predict": 4096,      # Max tokens prediction - đủ nội dung
+        "temperature": 0.3,       # Tăng nhẹ từ 0.2 để tránh early stopping, vẫn giữ chính xác
+        "top_p": 0.85,            # Giảm để tập trung vào tokens có xác suất cao
+        "top_k": 30,              # Giảm để hạn chế lựa chọn ngẫu nhiên
+        "repeat_penalty": 1.15,   # Tăng để tránh lặp lại trong phần giải thích
         "num_thread": 4,          # CPU cores
     }
 
@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     ENABLE_SEMANTIC_HISTORY: bool = True
     SEMANTIC_MODE: str = "hybrid"  # Modes: "sentence", "keyword", "hybrid"
     SEMANTIC_ALPHA: float = 0.7  # Sentence weight for hybrid (0.7 = 70% sentence, 30% keyword)
-    SEMANTIC_SIMILARITY_THRESHOLD: float = 0.85  # Similarity threshold to match
+    SEMANTIC_SIMILARITY_THRESHOLD: float = 0.95  # Similarity threshold to match (tăng từ 0.85)
 
     class Config:
         env_file = ".env"

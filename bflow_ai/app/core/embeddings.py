@@ -30,7 +30,13 @@ class EmbeddingService:
 
     _model: Optional[SentenceTransformer] = None
     _lock = threading.Lock()
-    _model_name = "bkai-foundation-models/vietnamese-bi-encoder"
+    # Nhẹ hơn, hỗ trợ đa ngôn ngữ, phù hợp câu hỏi kế toán đơn giản
+    _model_name = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+
+    # Alternative models (có thể thay đổi trong config):
+    # - "Qwen/Qwen2.5-0.5B-Instruct" - Nhẹ, nhanh, tốt cho tiếng Việt
+    # - "sentence-transformers/all-MiniLM-L6-v2" - Nhẹ nhất (~80MB)
+    # - "bkai-foundation-models/vietnamese-bi-encoder" - Model hiện tại (nặng)
 
     @classmethod
     def get_model(cls) -> SentenceTransformer:

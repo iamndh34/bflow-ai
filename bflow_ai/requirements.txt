@@ -28,6 +28,10 @@ safetensors==0.7.0
 scikit-learn==1.7.2
 scipy==1.16.3
 
+# Optional: Accelerate model loading
+# accelerate==1.2.1  # Bỏ comment nếu cần load model nhanh hơn
+# einops==0.8.0       # Bỏ comment nếu model cần tensor operations
+
 # =============================================================================
 # HTTP / Networking
 # =============================================================================

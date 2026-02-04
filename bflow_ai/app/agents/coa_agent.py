@@ -19,6 +19,7 @@ from ..core.config import settings
 from ..core.ollama_client import get_ollama_client
 from ..core.embeddings import get_embed_model, batch_cosine_similarity, encode_batch
 from ..services.stream_utils import stream_by_sentence
+from .templates import get_lookup_template, get_compare_template, get_compare_circular_template
 
 
 # =============================================================================
@@ -72,44 +73,13 @@ for item in COA_COMPARE_DATA:
 
 
 # =============================================================================
-# FEW-SHOT PROMPTS
+# TEMPLATES - Đã chuyển sang templates/coa.py
 # =============================================================================
-
-FEW_SHOT_COMPARE = """
-SO SÁNH TÀI KHOẢN 112 - TIỀN GỬI NGÂN HÀNG
-
-| Tiêu chí         | TT200 (2014)              | TT99 (2025)                   |
-|------------------|---------------------------|-------------------------------|
-| Số hiệu          | 112                       | 112                           |
-| Tên tài khoản    | Tiền gửi ngân hàng        | Tiền gửi không kỳ hạn         |
-| Tên tiếng Anh    | Cash in bank              | Cash in bank (Demand deposits)|
-| Loại tài khoản   | Tài sản                   | Tài sản                       |
-| TK con           | 1121, 1122, 1123          | Không có TK con               |
-
-NHẬN XÉT:
-- TT99 đổi tên từ "Tiền gửi ngân hàng" thành "Tiền gửi không kỳ hạn" để phân biệt rõ với tiền gửi có kỳ hạn.
-- TT99 đơn giản hóa cấu trúc, không chia TK con theo loại tiền (VND, ngoại tệ, vàng).
-"""
-
-FEW_SHOT_COA = """
-1. THÔNG TIN CƠ BẢN:
-- Số hiệu: 156
-- Tên tài khoản: Hàng hóa (Merchandise inventory)
-- Loại tài khoản: Tài sản (Loại 1)
-
-2. NỘI DUNG PHẢN ÁNH:
-- Tài khoản này dùng để phản ánh trị giá hiện có và tình hình biến động tăng, giảm của các loại hàng hóa của doanh nghiệp. Hàng hóa bao gồm: hàng mua về để bán, hàng gửi đi bán, hàng hóa bất động sản.
-
-3. KẾT CẤU VÀ NỘI DUNG:
-- Bên Nợ:
-  + Trị giá mua vào của hàng hóa nhập kho.
-  + Chi phí thu mua hàng hóa.
-  + Trị giá hàng hóa bị trả lại.
-- Bên Có:
-  + Trị giá vốn của hàng hóa xuất kho để bán, gửi đi bán.
-  + Chiết khấu thương mại, giảm giá hàng mua được hưởng.
-- Số dư bên Nợ: Trị giá thực tế của hàng hóa tồn kho cuối kỳ.
-"""
+# FEW_SHOT_COMPARE, FEW_SHOT_COA đã được thay thế bởi template functions:
+# - get_compare_template()
+# - get_lookup_template()
+# - get_compare_circular_template()
+# Xem: templates/coa.py
 
 
 # =============================================================================
@@ -272,8 +242,8 @@ class COAAgent(BaseAgent):
 Thông tin tài khoản tìm được:
 {acc_info}
 
-Hãy trả lời theo định dạng mẫu sau:
-{FEW_SHOT_COA}"""
+Hãy trả lời theo định dạng sau:
+{get_lookup_template()}"""
 
         try:
             client = get_ollama_client()
@@ -341,8 +311,8 @@ Hãy trả lời theo định dạng mẫu sau:
 Thông tin so sánh:
 {compare_info}
 
-Hãy trả lời theo định dạng mẫu sau:
-{FEW_SHOT_COMPARE}"""
+Hãy trả lời theo định dạng sau:
+{get_compare_template()}"""
 
         try:
             client = get_ollama_client()
@@ -396,13 +366,8 @@ Trình bày rõ ràng, có cấu trúc, dễ hiểu."""
 Dữ liệu so sánh giữa TT200 và TT99:
 {ctx}
 
-Hãy tóm tắt những điểm khác biệt chính, bao gồm:
-1. Tổng quan về các thay đổi
-2. Các tài khoản mới được bổ sung trong TT99
-3. Các tài khoản bị loại bỏ so với TT200
-4. Các tài khoản được đổi tên
-5. Các tài khoản bị bỏ chi tiết cấp 2
-6. Nhận xét tổng quan về xu hướng thay đổi"""
+YÊU CẦU: Trả lời ĐẦY ĐỦ theo format sau:
+{get_compare_circular_template()}"""
 
         try:
             client = get_ollama_client()
@@ -487,8 +452,8 @@ Hãy tóm tắt những điểm khác biệt chính, bao gồm:
 Thông tin tài khoản tìm được:
 {acc_info}
 
-Hãy trả lời theo định dạng mẫu sau:
-{FEW_SHOT_COA}"""
+Hãy trả lời theo định dạng sau:
+{get_lookup_template()}"""
 
         try:
             client = get_ollama_client()
@@ -542,8 +507,8 @@ Hãy trả lời theo định dạng mẫu sau:
 Thông tin so sánh:
 {compare_info}
 
-Hãy trả lời theo định dạng mẫu sau:
-{FEW_SHOT_COMPARE}"""
+Hãy trả lời theo định dạng sau:
+{get_compare_template()}"""
 
         try:
             client = get_ollama_client()
@@ -584,13 +549,8 @@ Trình bày rõ ràng, có cấu trúc, dễ hiểu."""
 Dữ liệu so sánh giữa TT200 và TT99:
 {ctx}
 
-Hãy tóm tắt những điểm khác biệt chính, bao gồm:
-1. Tổng quan về các thay đổi
-2. Các tài khoản mới được bổ sung trong TT99
-3. Các tài khoản bị loại bỏ so với TT200
-4. Các tài khoản được đổi tên
-5. Các tài khoản bị bỏ chi tiết cấp 2
-6. Nhận xét tổng quan về xu hướng thay đổi"""
+YÊU CẦU: Trả lời ĐẦY ĐỦ theo format sau:
+{get_compare_circular_template()}"""
 
         try:
             client = get_ollama_client()

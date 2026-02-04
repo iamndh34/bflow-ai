@@ -18,6 +18,7 @@ from ..core.config import settings
 from ..core.ollama_client import get_ollama_client
 from ..core.embeddings import get_embed_model
 from ..services.stream_utils import stream_by_sentence
+from .templates import get_posting_engine_template
 
 
 # =============================================================================
@@ -90,125 +91,6 @@ TX_CLASSIFICATION_SCHEMA = {
     },
     "required": ["transaction"]
 }
-
-FEW_SHOT_EXAMPLES = {
-    "DO_SALE": """1. TÊN NGHIỆP VỤ:
-Phiếu xuất kho bán hàng
-
-2. BẢNG BÚT TOÁN:
-- Nợ TK 632: Giá vốn hàng bán (*)
-- Có TK 156: Hàng hóa (*)
-- Nợ TK 13881: Phải thu tạm
-- Có TK 511: Doanh thu bán hàng (*)
-
-3. GIẢI THÍCH:
-- Nợ TK 632: Ghi nhận chi phí giá vốn hàng bán khi xuất kho
-- Có TK 156: Giảm giá trị hàng tồn kho khi xuất bán
-- Nợ TK 13881: Ghi nhận khoản phải thu tạm (đã giao hàng nhưng chưa xuất hóa đơn)
-- Có TK 511: Ghi nhận doanh thu bán hàng
-
-4. VÍ DỤ:
-Xuất kho bán máy phát điện (giá vốn 20tr, giá bán 25tr) kèm dịch vụ lắp đặt (5tr):
-- Nợ TK 632: 20.000.000đ
-- Có TK 156: 20.000.000đ
-- Nợ TK 13881: 30.000.000đ
-- Có TK 511: 30.000.000đ""",
-
-    "SALES_INVOICE": """1. TÊN NGHIỆP VỤ:
-Hóa đơn đầu ra
-
-2. BẢNG BÚT TOÁN:
-- Nợ TK 131: Phải thu của khách hàng (*)
-- Có TK 13881: Phải thu tạm
-- Có TK 33311: Thuế GTGT đầu ra
-
-3. GIẢI THÍCH:
-- Nợ TK 131: Ghi nhận công nợ phải thu từ khách hàng (bao gồm VAT)
-- Có TK 13881: Đối trừ khoản phải thu tạm (đã giao hàng trước đó)
-- Có TK 33311: Ghi nhận thuế GTGT đầu ra phải nộp
-
-4. VÍ DỤ:
-Xuất hóa đơn GTGT cho lô hàng + dịch vụ đã giao 30 triệu, VAT 10%:
-- Nợ TK 131: 33.000.000đ
-- Có TK 13881: 30.000.000đ
-- Có TK 33311: 3.000.000đ""",
-
-    "GRN_PURCHASE": """1. TÊN NGHIỆP VỤ:
-Phiếu nhập kho mua hàng
-
-2. BẢNG BÚT TOÁN:
-- Nợ TK 156: Hàng hóa (*)
-- Có TK 33881: Phải trả tạm
-
-3. GIẢI THÍCH:
-- Nợ TK 156: Ghi nhận tăng giá trị hàng tồn kho khi nhập kho
-- Có TK 33881: Ghi nhận khoản phải trả tạm (nhận hàng nhưng chưa có hóa đơn)
-
-4. VÍ DỤ:
-Nhập kho lô hàng hóa 50 triệu và nguyên vật liệu 20 triệu:
-- Nợ TK 156: 50.000.000đ
-- Nợ TK 152: 20.000.000đ
-- Có TK 33881: 70.000.000đ""",
-
-    "PURCHASE_INVOICE": """1. TÊN NGHIỆP VỤ:
-Hóa đơn đầu vào
-
-2. BẢNG BÚT TOÁN:
-- Nợ TK 33881: Phải trả tạm
-- Nợ TK 1331: Thuế GTGT được khấu trừ
-- Có TK 331: Phải trả cho người bán (*)
-
-3. GIẢI THÍCH:
-- Nợ TK 33881: Đối trừ khoản phải trả tạm (hàng đã nhập kho trước đó)
-- Nợ TK 1331: Ghi nhận thuế GTGT đầu vào được khấu trừ
-- Có TK 331: Ghi nhận công nợ phải trả cho nhà cung cấp
-
-4. VÍ DỤ:
-Nhận hóa đơn cho lô hàng đã nhập kho 70 triệu, thuế GTGT 10%:
-- Nợ TK 33881: 70.000.000đ
-- Nợ TK 1331: 7.000.000đ
-- Có TK 331: 77.000.000đ""",
-
-    "CASH_IN": """1. TÊN NGHIỆP VỤ:
-Phiếu thu tiền
-
-2. BẢNG BÚT TOÁN:
-- Nợ TK 111: Tiền mặt (*)
-- Nợ TK 112: Tiền gửi không kỳ hạn (*)
-- Có TK 131: Phải thu của khách hàng (*)
-
-3. GIẢI THÍCH:
-- Nợ TK 111: Ghi nhận tiền mặt thu được
-- Nợ TK 112: Ghi nhận tiền chuyển khoản thu được
-- Có TK 131: Giảm công nợ phải thu từ khách hàng
-
-4. VÍ DỤ:
-Khách hàng thanh toán công nợ 33 triệu: 3 triệu tiền mặt + 30 triệu chuyển khoản:
-- Nợ TK 111: 3.000.000đ
-- Nợ TK 112: 30.000.000đ
-- Có TK 131: 33.000.000đ""",
-
-    "CASH_OUT": """1. TÊN NGHIỆP VỤ:
-Phiếu chi tiền
-
-2. BẢNG BÚT TOÁN:
-- Nợ TK 331: Phải trả cho người bán (*)
-- Có TK 111: Tiền mặt (*)
-- Có TK 112: Tiền gửi không kỳ hạn (*)
-
-3. GIẢI THÍCH:
-- Nợ TK 331: Giảm công nợ phải trả cho nhà cung cấp
-- Có TK 111: Ghi nhận tiền mặt chi ra
-- Có TK 112: Ghi nhận tiền chuyển khoản chi ra
-
-4. VÍ DỤ:
-Thanh toán công nợ 100 triệu cho NCC: 10 triệu tiền mặt + 90 triệu chuyển khoản:
-- Nợ TK 331: 100.000.000đ
-- Có TK 111: 10.000.000đ
-- Có TK 112: 90.000.000đ"""
-}
-
-FEW_SHOT_DEFAULT = FEW_SHOT_EXAMPLES["DO_SALE"]
 
 
 # =============================================================================
@@ -455,18 +337,20 @@ class PostingEngineAgent(BaseAgent):
 
         entries_text = "\n".join(entries_list)
         tx_name = TRANSACTION_NAMES.get(tx, tx)
-        few_shot_example = FEW_SHOT_EXAMPLES.get(tx, FEW_SHOT_DEFAULT)
+        # Dùng template ngắn gọn thay vì few-shot examples dài
+        response_template = get_posting_engine_template()
 
         # 4. Generate response
         system_prompt = """Bạn là trợ lý kế toán Việt Nam. QUY TẮC BẮT BUỘC:
 - LUÔN trả lời bằng TIẾNG VIỆT
 - CHỈ sử dụng ĐÚNG các bút toán trong phần "BÚT TOÁN TỪ HỆ THỐNG"
 - KHÔNG được thêm, bớt, thay đổi hoặc tự bịa bút toán
-- Trả lời ĐÚNG 4 phần theo thứ thứ:
-  1. TÊN NGHIỆP VỤ: Tên nghiệp vụ
-  2. BẢNG BÚT TOÁN: Liệt kê bút toán (KHÔNG có số tiền)
-  3. GIẢI THÍCH: Giải thích ngắn gọn cho từng dòng bút toán
-  4. VÍ DỤ: Ví dụ cụ thể với số tiền"""
+- BẮT BUỘC hoàn thành ĐẦY ĐỦ 4 phần theo đúng thứ tự:
+  1. TÊN NGHIỆP VỤ
+  2. BẢNG BÚT TOÁN (liệt kê, KHÔNG có số tiền)
+  3. GIẢI THÍCH (giải thích từng dòng)
+  4. VÍ DỤ (với số tiền cụ thể)
+- QUAN TRỌNG: KHÔNG được dừng giữa chừng, phải viết đến hết phần 4"""
 
         slm_prompt = f"""Câu hỏi: {question}
 
@@ -475,8 +359,8 @@ NGHIỆP VỤ: {tx_name}
 BÚT TOÁN TỪ HỆ THỐNG (chỉ sử dụng các bút toán này):
 {entries_text}
 
-Trả lời theo định dạng mẫu sau:
-{few_shot_example}"""
+YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
+{response_template}"""
 
         try:
             client = get_ollama_client()
@@ -538,18 +422,20 @@ Trả lời theo định dạng mẫu sau:
 
         entries_text = "\n".join(entries_list)
         tx_name = TRANSACTION_NAMES.get(tx, tx)
-        few_shot_example = FEW_SHOT_EXAMPLES.get(tx, FEW_SHOT_DEFAULT)
+        # Dùng template ngắn gọn thay vì few-shot examples dài
+        response_template = get_posting_engine_template()
 
         # 4. Generate response
         system_prompt = """Bạn là trợ lý kế toán Việt Nam. QUY TẮC BẮT BUỘC:
 - LUÔN trả lời bằng TIẾNG VIỆT
 - CHỈ sử dụng ĐÚNG các bút toán trong phần "BÚT TOÁN TỪ HỆ THỐNG"
 - KHÔNG được thêm, bớt, thay đổi hoặc tự bịa bút toán
-- Trả lời ĐÚNG 4 phần theo thứ thứ:
-  1. TÊN NGHIỆP VỤ: Tên nghiệp vụ
-  2. BẢNG BÚT TOÁN: Liệt kê bút toán (KHÔNG có số tiền)
-  3. GIẢI THÍCH: Giải thích ngắn gọn cho từng dòng bút toán
-  4. VÍ DỤ: Ví dụ cụ thể với số tiền"""
+- BẮT BUỘC hoàn thành ĐẦY ĐỦ 4 phần theo đúng thứ tự:
+  1. TÊN NGHIỆP VỤ
+  2. BẢNG BÚT TOÁN (liệt kê, KHÔNG có số tiền)
+  3. GIẢI THÍCH (giải thích từng dòng)
+  4. VÍ DỤ (với số tiền cụ thể)
+- QUAN TRỌNG: KHÔNG được dừng giữa chừng, phải viết đến hết phần 4"""
 
         slm_prompt = f"""Câu hỏi: {question}
 
@@ -558,8 +444,8 @@ NGHIỆP VỤ: {tx_name}
 BÚT TOÁN TỪ HỆ THỐNG (chỉ sử dụng các bút toán này):
 {entries_text}
 
-Trả lời theo định dạng mẫu sau:
-{few_shot_example}"""
+YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
+{response_template}"""
 
         full_response = ""
         try:
