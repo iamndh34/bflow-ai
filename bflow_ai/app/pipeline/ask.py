@@ -811,6 +811,9 @@ class ResponseSaverStep:
         session_id: str,
         agent_name: str,
         cache_checker,
+        item_group: str = "GOODS",
+        partner_group: str = "CUSTOMER",
+        chat_type: str = "thinking",
         turn_off_saving: bool = False
     ):
         """
@@ -822,6 +825,9 @@ class ResponseSaverStep:
             session_id: Session ID
             agent_name: Tên agent
             cache_checker: StreamingCacheCheckerStep instance
+            item_group: Nhóm sản phẩm
+            partner_group: Nhóm đối tác
+            chat_type: Loại chat
             turn_off_saving: Bypass saving
         """
         if turn_off_saving:
@@ -831,7 +837,11 @@ class ResponseSaverStep:
         full_response = "".join(response_chunks)
 
         # === SAVE TO CACHE ===
-        cache_context = {"chat_type": "thinking"}
+        cache_context = {
+            "item_group": item_group,
+            "partner_group": partner_group,
+            "chat_type": chat_type
+        }
         cache_checker.save_to_cache(question, agent_name, full_response, cache_context)
 
         # === SAVE TO HISTORY ===
@@ -949,7 +959,11 @@ class AccountingPipeline:
 
             self.saver.save_response(
                 question, response_chunks, session_id, "GENERAL_FREE",
-                self.cache_checker, turn_off_saving=turn_off_saving
+                self.cache_checker,
+                item_group=item_group,
+                partner_group=partner_group,
+                chat_type=chat_type,
+                turn_off_saving=turn_off_saving
             )
             return
 
@@ -1013,7 +1027,11 @@ class AccountingPipeline:
         print("[Pipeline] STEP 7: Saving Response")
         self.saver.save_response(
             question, response_chunks, session_id, agent_name,
-            self.cache_checker, turn_off_saving=turn_off_saving
+            self.cache_checker,
+            item_group=item_group,
+            partner_group=partner_group,
+            chat_type=chat_type,
+            turn_off_saving=turn_off_saving
         )
 
         print(f"[Pipeline] ✓ Completed. Total response: {len(''.join(response_chunks))} chars")

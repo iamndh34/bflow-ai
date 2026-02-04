@@ -7,7 +7,28 @@ from app.db.mongodb import close_mongo_connection
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
+    # Startup - Clear all caches
+    print("=" * 60)
+    print("[Startup] Clearing all caches...")
+    try:
+        from app.services.streaming_cache import get_streaming_cache
+        cache = get_streaming_cache()
+        cache.clear()
+        print("[Startup] ✓ In-memory cache cleared")
+    except Exception as e:
+        print(f"[Startup] ✗ In-memory cache error: {e}")
+
+    try:
+        import redis
+        r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+        r.flushdb()
+        print("[Startup] ✓ Redis cache cleared")
+    except Exception as e:
+        print(f"[Startup] ✗ Redis not available or error: {e}")
+
+    print("[Startup] Cache clearing complete")
+    print("=" * 60)
+
     yield
     # Shutdown - đóng MongoDB connection
     await close_mongo_connection()

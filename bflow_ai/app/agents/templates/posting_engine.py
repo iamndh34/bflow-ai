@@ -10,43 +10,46 @@ Mỗi nghiệp vụ có example riêng để template phù hợp, tiết kiệm 
 
 _TEMPLATES = {
     "DO_SALE": """1. TÊN NGHIỆP VỤ:
-Xuất kho bán hàng hóa
+Xuất kho bán hàng hóa (chưa xuất hóa đơn)
 
 2. BẢNG BÚT TOÁN:
-- Nợ TK 156: Hàng hóa
-- Nợ TK 632: Giá vốn hàng bán
+- Nợ TK 13881: Phải thu tạm (Giao hàng chưa xuất HĐ)
+- Có TK 156: Hàng hóa
 - Có TK 33311: Thuế GTGT đầu ra
-- Có TK 111: Tiền mặt
+- Nợ TK 632: Giá vốn hàng bán
 
 3. GIẢI THÍCH:
-- Nợ TK 156: Ghi nhận giá trị hàng hóa đã bán chuyển vào giá vốn
-- Nợ TK 632: Ghi nhận giá vốn hàng bán transferred from hàng hóa
-- Có TK 33311: Ghi nhận thuế GTGT phải nộp nhà nước
-- Có TK 111: Ghi nhận thu tiền từ việc bán hàng
+- Nợ TK 13881: Ghi nhận công nợ tạm phải thu từ khách hàng (đợi xuất HĐ)
+- Có TK 156: Giảm hàng hóa trong kho
+- Có TK 33311: Ghi nhận thuế GTGT đầu ra
+- Nợ TK 632: Ghi nhận giá vốn hàng bán
 
 4. VÍ DỤ:
-Công ty bán 1.000 sp hàng giá 500.000đ/sp (tổng 500.000.000đ), giá vốn 300.000đ/sp (tổng 300.000.000đ), thuế GTGT 50.000.000đ.
-- Nợ TK 156: 500.000.000đ
-- Nợ TK 632: 300.000.000đ
+Công ty giao hàng cho khách A, giá trị hàng 500.000.000đ, giá vốn 300.000.000đ, thuế GTGT 50.000.000đ (chưa xuất HĐ).
+- Nợ TK 13881: 550.000.000đ
+- Có TK 156: 500.000.000đ
 - Có TK 33311: 50.000.000đ
-- Có TK 111: 150.000.000đ""",
+- Nợ TK 632: 300.000.000đ""",
 
     "SALES_INVOICE": """1. TÊN NGHIỆP VỤ:
-Xuất hóa đơn bán hàng
+Xuất hóa đơn bán hàng (đối chiếu giao hàng chưa xuất HĐ)
 
 2. BẢNG BÚT TOÁN:
-- Có TK 131: Phải thu khách hàng
+- Nợ TK 131: Phải thu khách hàng
+- Có TK 13881: Phải thu tạm (Giao hàng chưa xuất HĐ)
 - Có TK 33311: Thuế GTGT đầu ra
 - Nợ TK 511: Doanh thu
 
 3. GIẢI THÍCH:
-- Có TK 131: Ghi nhận công nợ phải thu từ khách hàng
+- Nợ TK 131: Ghi nhận công nợ phải thu từ khách hàng (theo HĐ)
+- Có TK 13881: Đối chiếu bút toán tạm khi giao hàng
 - Có TK 33311: Ghi nhận thuế GTGT trên hóa đơn
 - Nợ TK 511: Ghi nhận doanh thu
 
 4. VÍ DỤ:
-Công ty xuất hóa đơn cho khách hàng A giá trị hàng hóa 100.000.000đ, thuế GTGT 10.000.000đ.
-- Có TK 131: 110.000.000đ
+Xuất hóa đơn cho khách A giá trị hàng hóa 100.000.000đ, thuế GTGT 10.000.000đ (đã giao hàng trước đó).
+- Nợ TK 131: 110.000.000đ
+- Có TK 13881: 110.000.000đ (đối chiếu)
 - Có TK 33311: 10.000.000đ
 - Nợ TK 511: 100.000.000đ""",
 
@@ -67,39 +70,42 @@ Khách hàng A thanh toán 50.000.000đ cho công nợ.
 - Có TK 131: -50.000.000đ (giảm công nợ)""",
 
     "GRN_PURCHASE": """1. TÊN NGHIỆP VỤ:
-Nhập kho mua hàng
+Nhập kho mua hàng (chưa nhận hóa đơn)
 
 2. BẢNG BÚT TOÁN:
 - Nợ TK 152: Nguyên vật liệu
 - Nợ TK 153: Thuế GTGT đầu vào
-- Có TK 331: Phải trả nhà cung cấp
+- Có TK 33881: Phải trả tạm (Nhập hàng chưa có HĐ)
 
 3. GIẢI THÍCH:
-- Nợ TK 152: Ghi nhận nguyên vật liệu mua vào
+- Nợ TK 152: Ghi nhận hàng hóa nhập kho
 - Nợ TK 153: Ghi nhận thuế GTGT đầu vào được khấu trừ
-- Có TK 331: Ghi nhận công nợ phải trả NCC
+- Có TK 33881: Ghi nhận công nợ tạm phải trả NCC (đợi nhận HĐ)
 
 4. VÍ DỤ:
-Nhập 500kg nguyên liệu giá 200.000đ/kg, thuế GTGT 20.000.000đ.
+Nhập 500kg nguyên liệu giá 200.000đ/kg (tổng 100.000.000đ), thuế GTGT 10.000.000đ, chưa nhận hóa đơn.
 - Nợ TK 152: 100.000.000đ
-- Nợ TK 153: 20.000.000đ
-- Có TK 331: 120.000.000đ""",
+- Nợ TK 153: 10.000.000đ
+- Có TK 33881: 110.000.000đ""",
 
     "PURCHASE_INVOICE": """1. TÊN NGHIỆP VỤ:
-Nhận hóa đơn mua hàng
+Nhận hóa đơn mua hàng (đối chiếu nhập hàng chưa có HĐ)
 
 2. BẢNG BÚT TOÁN:
 - Nợ TK 153: Thuế GTGT đầu vào
 - Nợ TK 331: Phải trả nhà cung cấp
+- Có TK 33881: Phải trả tạm (Nhập hàng chưa có HĐ)
 
 3. GIẢI THÍCH:
-- Nợ TK 153: Ghi nhận thuế GTGT trên hóa đơn
-- Có TK 331: Ghi nhận công nợ phải trả NCC
+- Nợ TK 153: Ghi nhận thuế GTGT trên hóa đơn (đối chiếu/bổ sung)
+- Nợ TK 331: Ghi nhận công nợ phải trả NCC theo hóa đơn
+- Có TK 33881: Đối chiếu bút toán tạm khi nhập hàng
 
 4. VÍ DỤ:
-Nhận hóa đơn NCC giá trị hàng hóa 200.000.000đ, thuế GTGT 20.000.000đ.
-- Nợ TK 153: 20.000.000đ
-- Có TK 331: 220.000.000đ""",
+Nhận hóa đơn NCC giá trị hàng hóa 100.000.000đ, thuế GTGT 10.000.000đ (đã nhập kho trước đó).
+- Nợ TK 153: 10.000.000đ (đối chiếu/bổ sung)
+- Nợ TK 331: 110.000.000đ
+- Có TK 33881: 110.000.000đ (đối chiếu)""",
 
     "CASH_OUT": """1. TÊN NGHIỆP VỤ:
 Chi tiền cho nhà cung cấp
@@ -110,10 +116,10 @@ Chi tiền cho nhà cung cấp
 
 3. GIẢI THÍCH:
 - Nợ TK 331: Giảm công nợ phải trả NCC
-- Có TK 112: Giảm tiền mặt
+- Có TK 112: Giảm tiền gửi ngân hàng
 
 4. VÍ DỤ:
-Thanh toán 80.000.000đ cho NCC cho công nợ.
+Thanh toán 80.000.000đ cho NCC thanh toán công nợ.
 - Nợ TK 331: -80.000.000đ
 - Có TK 112: -80.000.000đ""",
 }
