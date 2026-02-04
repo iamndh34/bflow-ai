@@ -11,7 +11,7 @@ Chuyên gia về:
 from .base import BaseAgent, AgentRole, AgentResult, AgentContext
 from ..core.config import settings
 from ..core.ollama_client import get_ollama_client
-from ..services.stream_utils import stream_by_sentence
+from ..services.stream_utils import stream_by_char
 
 
 class GeneralAccountingAgent(BaseAgent):
@@ -73,6 +73,7 @@ Trình bày rõ ràng, có cấu trúc, dễ hiểu."""
             response = client.chat(
                 model=settings.GENERATION_MODEL,
                 messages=messages,
+                options=settings.OLLAMA_OPTIONS,
                 stream=False
             )
             content = response.get("message", {}).get("content", "")
@@ -109,11 +110,12 @@ Trình bày rõ ràng, có cấu trúc, dễ hiểu."""
             stream = client.chat(
                 model=settings.GENERATION_MODEL,
                 messages=messages,
+                options=settings.OLLAMA_OPTIONS,
                 stream=True
             )
 
-            for sentence in stream_by_sentence(stream):
-                yield sentence
+            for char in stream_by_char(stream):
+                yield char
 
         except Exception as e:
             print(f"[GeneralAccountingAgent Stream Error] {e}")
@@ -168,6 +170,7 @@ QUY TẮC BẮT BUỘC:
             response = client.chat(
                 model=settings.GENERATION_MODEL,
                 messages=messages,
+                options=settings.OLLAMA_OPTIONS,
                 stream=False
             )
             content = response.get("message", {}).get("content", "")
@@ -206,11 +209,12 @@ QUY TẮC BẮT BUỘC:
             stream = client.chat(
                 model=settings.GENERATION_MODEL,
                 messages=messages,
+                options=settings.OLLAMA_OPTIONS,
                 stream=True
             )
 
-            for sentence in stream_by_sentence(stream):
-                yield sentence
+            for char in stream_by_char(stream):
+                yield char
 
         except Exception as e:
             print(f"[GeneralFreeAgent Stream Error] {e}")

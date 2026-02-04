@@ -18,7 +18,7 @@ from .base import BaseAgent, AgentRole, AgentResult, AgentContext, Tool
 from ..core.config import settings
 from ..core.ollama_client import get_ollama_client
 from ..core.embeddings import get_embed_model, batch_cosine_similarity, encode_batch
-from ..services.stream_utils import stream_by_sentence
+from ..services.stream_utils import stream_by_char
 from .templates import get_lookup_template, get_compare_template, get_compare_circular_template
 
 
@@ -70,16 +70,6 @@ COA_200_BY_CODE = {acc["code"]: acc for acc in COA_200_DATA}
 COA_COMPARE_BY_TYPE = defaultdict(list)
 for item in COA_COMPARE_DATA:
     COA_COMPARE_BY_TYPE[item["change_type"]].append(item)
-
-
-# =============================================================================
-# TEMPLATES - Đã chuyển sang templates/coa.py
-# =============================================================================
-# FEW_SHOT_COMPARE, FEW_SHOT_COA đã được thay thế bởi template functions:
-# - get_compare_template()
-# - get_lookup_template()
-# - get_compare_circular_template()
-# Xem: templates/coa.py
 
 
 # =============================================================================
@@ -253,6 +243,7 @@ Hãy trả lời theo định dạng sau:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": slm_prompt}
                 ],
+                options=settings.OLLAMA_OPTIONS,
                 stream=False
             )
             content = response.get("message", {}).get("content", "")
@@ -322,6 +313,7 @@ Hãy trả lời theo định dạng sau:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": slm_prompt}
                 ],
+                options=settings.OLLAMA_OPTIONS,
                 stream=False
             )
             content = response.get("message", {}).get("content", "")
@@ -377,6 +369,7 @@ YÊU CẦU: Trả lời ĐẦY ĐỦ theo format sau:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": slm_prompt}
                 ],
+                options=settings.OLLAMA_OPTIONS,
                 stream=False
             )
             content = response.get("message", {}).get("content", "")
@@ -463,12 +456,13 @@ Hãy trả lời theo định dạng sau:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": slm_prompt}
                 ],
+                options=settings.OLLAMA_OPTIONS,
                 stream=True
             )
             slm_output = ""
-            for sentence in stream_by_sentence(stream):
-                slm_output += sentence
-                yield sentence
+            for char in stream_by_char(stream):
+                slm_output += char
+                yield char
 
             # Fallback if needed
             if not slm_output or "1." not in slm_output:
@@ -518,12 +512,13 @@ Hãy trả lời theo định dạng sau:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": slm_prompt}
                 ],
+                options=settings.OLLAMA_OPTIONS,
                 stream=True
             )
             slm_output = ""
-            for sentence in stream_by_sentence(stream):
-                slm_output += sentence
-                yield sentence
+            for char in stream_by_char(stream):
+                slm_output += char
+                yield char
 
             if not slm_output or "SO SÁNH" not in slm_output.upper():
                 yield self._generate_compare_fallback(code, acc_99, acc_200)
@@ -560,12 +555,13 @@ YÊU CẦU: Trả lời ĐẦY ĐỦ theo format sau:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": slm_prompt}
                 ],
+                options=settings.OLLAMA_OPTIONS,
                 stream=True
             )
             slm_output = ""
-            for sentence in stream_by_sentence(stream):
-                slm_output += sentence
-                yield sentence
+            for char in stream_by_char(stream):
+                slm_output += char
+                yield char
 
             if not slm_output or len(slm_output) < 50:
                 yield self._generate_circular_fallback(diff)

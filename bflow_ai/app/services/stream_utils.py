@@ -35,9 +35,13 @@ def stream_by_sentence(ollama_stream, buffer_size_words: int = 5):
     sentence_end_pattern = re.compile(r'([.!?]+\s+|\n\n+)')
 
     for chunk in ollama_stream:
-        # Handle both dict format (Ollama) and string format
-        if isinstance(chunk, dict):
+        # Handle ChatResponse objects from ollama library
+        if hasattr(chunk, 'message') and hasattr(chunk.message, 'content'):
+            content = chunk.message.content
+        # Handle dict format (backward compatibility)
+        elif isinstance(chunk, dict):
             content = chunk.get("message", {}).get("content", "")
+        # Handle string format
         elif isinstance(chunk, str):
             content = chunk
         else:
@@ -114,6 +118,35 @@ def stream_by_phrase(ollama_stream, phrases_per_yield: int = 2):
         yield buffer
 
 
+def stream_by_char(ollama_stream):
+    """
+    Yield từng chữ một (true character-by-character streaming).
+
+    Args:
+        ollama_stream: Iterator từ ollama.chat(stream=True)
+
+    Yields:
+        str: Từng chữ
+    """
+    for chunk in ollama_stream:
+        # Handle ChatResponse objects from ollama library
+        if hasattr(chunk, 'message') and hasattr(chunk.message, 'content'):
+            content = chunk.message.content
+        # Handle dict format (backward compatibility)
+        elif isinstance(chunk, dict):
+            content = chunk.get("message", {}).get("content", "")
+        # Handle string format
+        elif isinstance(chunk, str):
+            content = chunk
+        else:
+            continue
+
+        if content:
+            # Yield each character individually
+            for char in content:
+                yield char
+
+
 def stream_by_word(ollama_stream):
     """
     Yield từng từ một (fallback mode).
@@ -125,8 +158,13 @@ def stream_by_word(ollama_stream):
         str: Từng từ
     """
     for chunk in ollama_stream:
-        if isinstance(chunk, dict):
+        # Handle ChatResponse objects from ollama library
+        if hasattr(chunk, 'message') and hasattr(chunk.message, 'content'):
+            content = chunk.message.content
+        # Handle dict format (backward compatibility)
+        elif isinstance(chunk, dict):
             content = chunk.get("message", {}).get("content", "")
+        # Handle string format
         elif isinstance(chunk, str):
             content = chunk
         else:

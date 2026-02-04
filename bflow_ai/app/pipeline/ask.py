@@ -961,37 +961,9 @@ class AccountingPipeline:
         agent_name = agent.name
 
         # =========================================================================
-        # STEP 4: SEMANTIC HISTORY CHECK
+        # STEP 4: STREAMING CACHE CHECK (History disabled)
         # =========================================================================
-        print("[Pipeline] STEP 4: Semantic History Check")
-        history_response = self.history_checker.check_history(
-            question=question,
-            session_id=session_id,
-            agent_name=agent_name,
-            chat_type=chat_type,
-            turn_off=turn_off_history_check
-        )
-
-        if history_response is not None:
-            # Tìm thấy trong history! Simulate streaming
-            print("[Pipeline] ✓ Found in history - Simulating streaming...")
-
-            response_chunks = []
-            for chunk in self.cache_checker._simulate_streaming_from_cache(history_response):
-                response_chunks.append(chunk)
-                yield chunk
-
-            # Lưu lại vào history
-            self.saver.save_response(
-                question, response_chunks, session_id, agent_name,
-                self.cache_checker, turn_off_saving=turn_off_saving
-            )
-            return
-
-        # =========================================================================
-        # STEP 5: STREAMING CACHE CHECK
-        # =========================================================================
-        print("[Pipeline] STEP 5: Streaming Cache Check")
+        print("[Pipeline] STEP 4: Streaming Cache Check")
         cached_stream_gen = self.cache_checker.check_cache(
             question=question,
             agent_name=agent_name,
@@ -1016,28 +988,29 @@ class AccountingPipeline:
             return
 
         # =========================================================================
-        # STEP 6: AGENT EXECUTION (LLM Call)
+        # STEP 5: AGENT EXECUTION (LLM Call)
         # =========================================================================
-        print("[Pipeline] STEP 6: Agent Execution (Calling LLM...)")
+        print("[Pipeline] STEP 5: Agent Execution (Calling LLM...)")
         response_chunks = []
 
         # Execute agent và stream response
         llm_stream = self.executor.execute_agent(agent, context, turn_off_llm=turn_off_llm)
 
         # =========================================================================
-        # STEP 7: STREAM PROCESSING
+        # STEP 6: STREAM PROCESSING
         # =========================================================================
-        print("[Pipeline] STEP 7: Stream Processing")
+        print("[Pipeline] STEP 6: Stream Processing")
+        # Pass-through: agent đã handle streaming với stream_by_char
         for chunk in self.stream_processor.process_stream(
-            llm_stream, buffer_size=5, turn_off_processing=turn_off_stream_processing
+            llm_stream, buffer_size=5, turn_off_processing=True  # Agent đã xử lý streaming
         ):
             response_chunks.append(chunk)
             yield chunk
 
         # =========================================================================
-        # STEP 8: SAVE RESPONSE
+        # STEP 7: SAVE RESPONSE
         # =========================================================================
-        print("[Pipeline] STEP 8: Saving Response")
+        print("[Pipeline] STEP 7: Saving Response")
         self.saver.save_response(
             question, response_chunks, session_id, agent_name,
             self.cache_checker, turn_off_saving=turn_off_saving

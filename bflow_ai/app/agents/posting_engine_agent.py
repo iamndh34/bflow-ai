@@ -17,8 +17,8 @@ from .base import BaseAgent, AgentRole, AgentResult, AgentContext, Tool
 from ..core.config import settings
 from ..core.ollama_client import get_ollama_client
 from ..core.embeddings import get_embed_model
-from ..services.stream_utils import stream_by_sentence
-from .templates import get_posting_engine_template
+from ..services.stream_utils import stream_by_char
+from .templates import get_response_template
 
 
 # =============================================================================
@@ -156,6 +156,7 @@ class MiniRAGRetriever:
                     {"role": "user", "content": TX_CLASSIFICATION_PROMPT.format(question=query)}
                 ],
                 format=TX_CLASSIFICATION_SCHEMA,
+                options=settings.OLLAMA_OPTIONS,
                 stream=False
             )
             content = response.get("message", {}).get("content", "")
@@ -313,8 +314,6 @@ class PostingEngineAgent(BaseAgent):
 
     def execute(self, context: AgentContext) -> AgentResult:
         """Thực thi query"""
-        import ollama
-
         question = context.question
         item_group = context.item_group
         partner_group = context.partner_group
@@ -337,8 +336,8 @@ class PostingEngineAgent(BaseAgent):
 
         entries_text = "\n".join(entries_list)
         tx_name = TRANSACTION_NAMES.get(tx, tx)
-        # Dùng template ngắn gọn thay vì few-shot examples dài
-        response_template = get_posting_engine_template()
+        # Dùng template cụ thể cho từng nghiệp vụ
+        response_template = get_response_template(tx)
 
         # 4. Generate response
         system_prompt = """Bạn là trợ lý kế toán Việt Nam. QUY TẮC BẮT BUỘC:
@@ -370,12 +369,10 @@ YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": slm_prompt}
                 ],
+                options=settings.OLLAMA_OPTIONS,
                 stream=False
             )
             content = response.get("message", {}).get("content", "")
-
-            if not content or "1." not in content:
-                content = self._generate_fallback(tx_name, entries)
 
             # Add notes
             content += self._generate_notes(entries)
@@ -398,8 +395,6 @@ YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
 
     def stream_execute(self, context: AgentContext):
         """Execute với streaming response"""
-        import ollama
-
         question = context.question
         item_group = context.item_group
         partner_group = context.partner_group
@@ -422,8 +417,8 @@ YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
 
         entries_text = "\n".join(entries_list)
         tx_name = TRANSACTION_NAMES.get(tx, tx)
-        # Dùng template ngắn gọn thay vì few-shot examples dài
-        response_template = get_posting_engine_template()
+        # Dùng template cụ thể cho từng nghiệp vụ
+        response_template = get_response_template(tx)
 
         # 4. Generate response
         system_prompt = """Bạn là trợ lý kế toán Việt Nam. QUY TẮC BẮT BUỘC:
@@ -456,18 +451,24 @@ YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": slm_prompt}
                 ],
+                options=settings.OLLAMA_OPTIONS,
                 stream=True
             )
-            for sentence in stream_by_sentence(stream):
-                full_response += sentence
-                yield sentence
+
+            # Debug: collect first few chunks
+            chunk_count = 0
+            for char in stream_by_char(stream):
+                if chunk_count == 0:
+                    print(f"[PostingEngineAgent Stream DEBUG] First char received: '{char}'")
+                chunk_count += 1
+                full_response += char
+                yield char
+
+            print(f"[PostingEngineAgent Stream DEBUG] Total chunks received: {chunk_count}")
+            print(f"[PostingEngineAgent Stream DEBUG] Full response length: {len(full_response)}")
 
         except Exception as e:
             print(f"[PostingEngineAgent Stream Error] {e}")
-
-        if not full_response or "1." not in full_response:
-            full_response = self._generate_fallback(tx_name, entries)
-            yield full_response
 
         # Add notes
         notes = self._generate_notes(entries)
