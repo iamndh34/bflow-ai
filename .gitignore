@@ -90,3 +90,49 @@ htmlcov/
 build/
 dist/
 *.egg-info/
+
+# =============================================================================
+# Docker
+# =============================================================================
+*.dockerfile
+docker-compose.override.yml
+docker-compose.*.yml
+!docker-compose.yaml
+
+# =============================================================================
+# ML / AI / Models
+# =============================================================================
+models/
+*.bin
+*.safetensors
+*.gguf
+*.onnx
+.huggingface/
+.cache/
+*cache*/
+
+# =============================================================================
+# Project Specific
+# =============================================================================
+# Conversation history & sessions
+bflow_ai/app/services/rag_json/sessions/
+bflow_ai/app/services/rag_json/conversation_history.json
+
+# Backups
+backups/
+*.backup
+*.archive
+
+# Node.js (assistant script)
+node_modules/
+package-lock.json
+yarn.lock
+
+# =============================================================================
+# Temporary files
+# =============================================================================
+tmp/
+temp/
+*.tmp
+*.bak
+.nfs*
