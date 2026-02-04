@@ -230,7 +230,7 @@ QUY TẮC BẮT BUỘC:
             response = client.chat(
                 model=settings.GENERATION_MODEL,
                 messages=messages,
-                options=settings.OLLAMA_OPTIONS,
+                options=settings.GENERAL_FREE_OPTIONS,  # Dùng options riêng cho free chat
                 stream=False
             )
             content = response.get("message", {}).get("content", "")
@@ -271,7 +271,7 @@ QUY TẮC BẮT BUỘC:
             stream = client.chat(
                 model=settings.GENERATION_MODEL,
                 messages=messages,
-                options=settings.OLLAMA_OPTIONS,
+                options=settings.GENERAL_FREE_OPTIONS,  # Dùng options riêng cho free chat
                 stream=True
             )
 
