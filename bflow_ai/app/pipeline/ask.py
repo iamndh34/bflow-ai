@@ -595,6 +595,8 @@ class StreamingCacheStep:
         """
         Kiểm tra cache cho question.
 
+        Khi cache hit: regenerate phần VÍ DỤ (part 4) với số mới.
+
         Args:
             question: Câu hỏi
             agent_name: Tên agent
@@ -602,7 +604,7 @@ class StreamingCacheStep:
             turn_off: Bypass cache check
 
         Returns:
-            Generator yielding chunks từ cache (hoặc None nếu cache miss)
+            Generator yielding chunks từ cache + example mới (hoặc None nếu cache miss)
         """
         if turn_off:
             return None
@@ -614,12 +616,193 @@ class StreamingCacheStep:
         cached_response = self.cache.get(cache_key)
 
         if cached_response is not None:
-            print(f"[CacheStep] ✓ CACHE HIT! (key: {cache_key[:12]}...)")
+            print(f"[CacheStep] ✓ CACHE HIT! Regenerating example with new numbers...")
+
+            # Cache hit: regenerate example (part 4)
+            full_response = self._regenerate_example(cached_response, agent_name)
+
             # Return generator simulate streaming
-            return self._simulate_streaming_from_cache(cached_response)
+            return self._simulate_streaming_from_cache(full_response)
 
         print(f"[CacheStep] ✗ Cache miss (key: {cache_key[:12]}...)")
         return None
+
+    def _regenerate_example(self, cached_response: str, agent_name: str) -> str:
+        """
+        Regenerate phần 4 (VÍ DỤ) với số mới, dùng LLM để phân loại.
+
+        Preserve phần "Ghi chú" và "Lưu ý" từ cached response.
+
+        Args:
+            cached_response: Response từ cache (không có phần 4, có thể có Ghi chú/Lưu ý)
+            agent_name: Tên agent
+
+        Returns:
+            Full response với example mới + Ghi chú/Lưu ý (nếu có)
+        """
+        import re
+
+        # Tách cached response thành: main_content + footer (Ghi chú, Lưu ý)
+        main_lines = []
+        footer_lines = []
+        in_footer = False
+
+        for line in cached_response.split('\n'):
+            line_stripped = line.strip()
+            if line_stripped.startswith('Ghi chú:') or line_stripped.startswith('Lưu ý:'):
+                in_footer = True
+
+            if in_footer:
+                footer_lines.append(line)
+            else:
+                main_lines.append(line)
+
+        main_content = '\n'.join(main_lines).strip()
+        footer_content = '\n'.join(footer_lines).strip() if footer_lines else ""
+
+        # Bước 1: Dùng LLM để xác định tx_type
+        tx_type = self._classify_tx_type_with_llm(cached_response, agent_name)
+
+        # Bước 2: Generate example với số ngẫu nhiên
+        example = self._generate_example_for_tx_type(tx_type, cached_response)
+
+        # Bước 3: Combine: main + example + footer
+        result = f"{main_content}\n\n4. VÍ DỤ:\n{example}"
+        if footer_content:
+            result += f"\n\n{footer_content}"
+
+        return result
+
+    def _classify_tx_type_with_llm(self, cached_response: str, agent_name: str) -> str:
+        """
+        Dùng LLM để phân loại tx_type từ cached response.
+
+        Thông minh hơn regex/account mapping - LLM hiểu ngữ nghĩa.
+        """
+        from ..core.ollama_client import get_ollama_client
+        from ..core.config import settings
+
+        client = get_ollama_client()
+
+        # Lấy phần đầu của response (chứa tên nghiệp vụ và bút toán)
+        first_part = '\n'.join(cached_response.split('\n')[:20])
+
+        prompt = f"""Phân loại loại giao dịch kế toán sau thành MỘT trong các loại sau:
+
+CÁC LOẠI GIAO DỊCH:
+- DO_SALE: Xuất kho bán hàng (chưa xuất hóa đơn)
+- SALES_INVOICE: Xuất hóa đơn bán hàng
+- CASH_IN: Thu tiền từ khách hàng
+- GRN_PURCHASE: Nhập kho mua hàng (chưa có hóa đơn)
+- PURCHASE_INVOICE: Nhận hóa đơn mua hàng
+- CASH_OUT: Chi tiền cho nhà cung cấp
+
+RESPONSE ĐỂ PHÂN LOẠI:
+{first_part}
+
+CHỈ TRẢ VỀ MỘT TỪ: tên loại giao dịch (ví dụ: DO_SALE, SALES_INVOICE, CASH_IN, etc.)"""
+
+        try:
+            response = client.chat(
+                model=settings.CLASSIFIER_MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                options=settings.OLLAMA_OPTIONS,
+                stream=False
+            )
+
+            result = response.get("message", {}).get("content", "").strip().upper()
+
+            # Clean result - remove common variations
+            for valid_type in ['DO_SALE', 'SALES_INVOICE', 'CASH_IN', 'GRN_PURCHASE', 'PURCHASE_INVOICE', 'CASH_OUT']:
+                if valid_type in result:
+                    print(f"[RegenerateExample] LLM classified as: {valid_type}")
+                    return valid_type
+
+            print(f"[RegenerateExample] LLM returned unknown: {result}, using DO_SALE fallback")
+            return 'DO_SALE'
+
+        except Exception as e:
+            print(f"[RegenerateExample] LLM classification failed: {e}, using DO_SALE fallback")
+            return 'DO_SALE'
+
+    def _generate_example_for_tx_type(self, tx_type: str, cached_response: str) -> str:
+        """
+        Generate example cho tx_type với số ngẫu nhiên.
+        """
+        import random
+        import re
+
+        # Config: tx_type -> description template
+        DESC_TEMPLATES = {
+            'DO_SALE': "Công ty giao hàng cho khách A, giá trị hàng {amount:,}đ (giá vốn {cost:,}đ), thuế GTGT {tax:,}đ (chưa xuất HĐ).",
+            'SALES_INVOICE': "Xuất hóa đơn cho khách A giá trị hàng hóa {amount:,}đ, thuế GTGT {tax:,}đ.",
+            'CASH_IN': "Khách hàng thanh toán {amount:,}đ cho công nợ.",
+            'GRN_PURCHASE': "Nhập {amount_qty} nguyên liệu giá {unit_price:,}đ/kg (tổng {amount:,}đ), thuế GTGT {tax:,}đ, chưa nhận hóa đơn.",
+            'PURCHASE_INVOICE': "Nhận hóa đơn NCC giá trị hàng hóa {amount:,}đ, thuế GTGT {tax:,}đ.",
+            'CASH_OUT': "Thanh toán {amount:,}đ cho NCC thanh toán công nợ.",
+        }
+
+        # Config: Account -> amount calculation rule
+        AMOUNT_RULES = {
+            '153': lambda b, t: t,
+            '33311': lambda b, t: t,
+            '632': lambda b, t: int(b * 0.6),
+            '13881': lambda b, t: b + t,
+            '33881': lambda b, t: b + t,
+        }
+
+        # Extract entries from cached response (flexible regex)
+        entries = []
+        for line in cached_response.split('\n'):
+            match = re.match(r'-?\s*(Nợ|Có)\s+TK\s+(\d+):', line.strip())
+            if match:
+                entries.append({
+                    'side': match.group(1),
+                    'account': match.group(2)
+                })
+
+        # Deduplicate
+        seen = set()
+        unique_entries = []
+        for e in entries:
+            key = f"{e['side']}_{e['account']}"
+            if key not in seen:
+                seen.add(key)
+                unique_entries.append(e)
+        entries = unique_entries
+
+        # Generate random amounts
+        base_amount = random.randint(1, 900) * 1000000
+        tax_amount = base_amount // 10
+        cost_amount = int(base_amount * 0.6)
+
+        # Build description
+        template = DESC_TEMPLATES.get(tx_type, "Giao dịch có giá trị {amount:,}đ.")
+
+        # Special handling for GRN_PURCHASE with quantity
+        if tx_type == 'GRN_PURCHASE':
+            unit_price = random.randint(100, 500) * 1000
+            amount_qty = random.randint(100, 1000)
+            base_amount = unit_price * amount_qty
+            tax_amount = base_amount // 10
+            description = template.format(amount=base_amount, tax=tax_amount,
+                                         amount_qty=amount_qty, unit_price=unit_price)
+        else:
+            description = template.format(amount=base_amount, tax=tax_amount, cost=cost_amount)
+
+        # Build example lines
+        example_lines = [description]
+
+        for entry in entries:
+            acc = entry['account']
+            amount = AMOUNT_RULES.get(acc, lambda b, t: b)(base_amount, tax_amount)
+
+            if entry['side'] == 'Nợ':
+                example_lines.append(f"- Nợ TK {entry['account']}: {amount:,}đ")
+            else:
+                example_lines.append(f"- Có TK {entry['account']}: {amount:,}đ")
+
+        return '\n'.join(example_lines)
 
     def _generate_cache_key(self, question: str, agent_name: str, context: dict) -> str:
         """
@@ -674,7 +857,10 @@ class StreamingCacheStep:
 
     def save_to_cache(self, question: str, agent_name: str, response: str, cache_context: dict):
         """
-        Save response to cache.
+        Save response to cache (WITHOUT example - part 4).
+
+        Example sẽ được regenerate mới mỗi cache hit để có số khác.
+        Phần "Ghi chú" và "Lưu ý" được giữ lại.
 
         Args:
             question: Câu hỏi
@@ -682,9 +868,48 @@ class StreamingCacheStep:
             response: Full response
             cache_context: Context dict
         """
+        import re
+
+        # Strip phần 4 (VÍ DỤ) nhưng GIỮ lại phần "Ghi chú" và "Lưu ý"
+        lines = response.split('\n')
+        cache_lines = []
+        skip_example = False
+
+        for line in lines:
+            line_stripped = line.strip()
+
+            # Bắt đầu phần 4 - skip dòng header
+            if re.match(r'^4\.\s*VÍ DỤ:', line_stripped):
+                skip_example = True
+                continue
+
+            # Kết thúc phần 4 - khi gặp "Ghi chú:", "Lưu ý:", hoặc section mới
+            if skip_example and (
+                line_stripped.startswith('Ghi chú:') or
+                line_stripped.startswith('Lưu ý:') or
+                re.match(r'^\d+\.', line_stripped)  # Section mới như "5."
+            ):
+                skip_example = False
+
+            # Skip chỉ các dòng example (có "-" hoặc là mô tả context)
+            # Giữ lại các dòng khác như "Ghi chú:", "Lưu ý:"
+            if skip_example:
+                # Skip nếu là dòng example (bắt đầu bằng "-") hoặc dòng mô tả
+                if line_stripped.startswith('-') or (
+                    line_stripped and not line_stripped.startswith('Ghi chú') and
+                    not line_stripped.startswith('Lưu ý') and
+                    not re.match(r'^\d+\.', line_stripped) and
+                    ':' not in line_stripped  # Không có dấu ":" -> không phải header
+                ):
+                    continue
+
+            cache_lines.append(line)
+
+        cached_response = '\n'.join(cache_lines).strip()
+
         cache_key = self._generate_cache_key(question, agent_name, cache_context)
-        self.cache.set(cache_key, response)
-        print(f"[CacheStep] Saved to cache (key: {cache_key[:12]}...)")
+        self.cache.set(cache_key, cached_response)
+        print(f"[CacheStep] Saved to cache WITHOUT example (key: {cache_key[:12]}...)")
 
 
 # =============================================================================
