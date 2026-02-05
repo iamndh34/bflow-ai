@@ -343,7 +343,7 @@ class PostingEngineAgent(BaseAgent):
         # Build lookup instructions
         lookup_instruction = ""
         if lookup_accounts:
-            lookup_instruction = f"\n\nQUAN TRỌNG: Các tài khoản {', '.join(lookup_accounts)} là LOOKUP (phải có dấu *). PHẢI đánh dấu (*) sau tên tài khoản này trong phần 2. BẢNG BÚT TOÁN."
+            lookup_instruction = f"\n\nLưu ý: Các tài khoản có dấu (*) là LOOKUP, phụ thuộc item_group/partner_group."
 
         # Dùng template cụ thể cho từng nghiệp vụ
         response_template = get_response_template(tx)
@@ -364,11 +364,11 @@ class PostingEngineAgent(BaseAgent):
 
 NGHIỆP VỤ: {tx_name}
 
-BÚT TOÁN TỪ HỆ THỐNG (chỉ sử dụng các bút toán này):
+BÚT TOÁN TỪ HỆ THỐNG:
 {entries_text}
 {lookup_instruction}
 
-YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
+YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo format:
 {response_template}"""
 
         try:
@@ -434,7 +434,7 @@ YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
         # Build lookup instructions
         lookup_instruction = ""
         if lookup_accounts:
-            lookup_instruction = f"\n\nQUAN TRỌNG: Các tài khoản {', '.join(lookup_accounts)} là LOOKUP (phải có dấu *). PHẢI đánh dấu (*) sau tên tài khoản này trong phần 2. BẢNG BÚT TOÁN."
+            lookup_instruction = f"\n\nLưu ý: Các tài khoản có dấu (*) là LOOKUP, phụ thuộc item_group/partner_group."
 
         # Dùng template cụ thể cho từng nghiệp vụ
         response_template = get_response_template(tx)
@@ -444,22 +444,17 @@ YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
 - LUÔN trả lời bằng TIẾNG VIỆT
 - CHỈ sử dụng ĐÚNG các bút toán trong phần "BÚT TOÁN TỪ HỆ THỐNG"
 - KHÔNG được thêm, bớt, thay đổi hoặc tự bịa bút toán
-- BẮT BUỘC hoàn thành ĐẦY ĐỦ 4 phần theo đúng thứ tự:
-  1. TÊN NGHIỆP VỤ
-  2. BẢNG BÚT TOÁN (liệt kê, KHÔNG có số tiền)
-  3. GIẢI THÍCH (giải thích từng dòng)
-  4. VÍ DỤ (với số tiền cụ thể)
-- QUAN TRỌNG: KHÔNG được dừng giữa chừng, phải viết đến hết phần 4"""
+- BẮT BUỘC hoàn thành ĐẦY ĐỦ 4 phần theo đúng thứ tự"""
 
         slm_prompt = f"""Câu hỏi: {question}
 
 NGHIỆP VỤ: {tx_name}
 
-BÚT TOÁN TỪ HỆ THỐNG (chỉ sử dụng các bút toán này):
+BÚT TOÁN TỪ HỆ THỐNG:
 {entries_text}
 {lookup_instruction}
 
-YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
+YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo format:
 {response_template}"""
 
         full_response = ""
