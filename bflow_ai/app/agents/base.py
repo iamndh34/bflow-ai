@@ -55,10 +55,11 @@ class AgentContext:
     question: str
     session_id: Optional[str] = None
     chat_type: str = "thinking"
-    item_group: str = "GOODS"
-    partner_group: str = "CUSTOMER"
+    item_group: Optional[str] = None  # Chỉ PostingEngineAgent cần
+    partner_group: Optional[str] = None  # Chỉ PostingEngineAgent cần
     history: List[Dict] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
+    skip_cache: bool = False  # Skip cache for this request (e.g., GENERAL_FREE)
 
 
 class BaseAgent(ABC):

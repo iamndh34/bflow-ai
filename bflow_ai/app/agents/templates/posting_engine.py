@@ -2,6 +2,8 @@
 Template Module cho Posting Engine - Ví dụ cụ thể cho từng nghiệp vụ
 
 Mỗi nghiệp vụ có example riêng để template phù hợp, tiết kiệm tokens.
+
+NOTE: Dấu (*) đánh dấu các tài khoản LOOKUP (phụ thuộc item_group/partner_group)
 """
 
 # =============================================================================
@@ -13,23 +15,23 @@ _TEMPLATES = {
 Xuất kho bán hàng hóa (chưa xuất hóa đơn)
 
 2. BẢNG BÚT TOÁN:
+- Nợ TK 632 (*): Giá vốn hàng bán
+- Có TK 156 (*): Hàng hóa
 - Nợ TK 13881: Phải thu tạm (Giao hàng chưa xuất HĐ)
-- Có TK 156: Hàng hóa
-- Có TK 33311: Thuế GTGT đầu ra
-- Nợ TK 632: Giá vốn hàng bán
+- Có TK 511 (*): Doanh thu bán hàng
 
 3. GIẢI THÍCH:
-- Nợ TK 13881: Ghi nhận công nợ tạm phải thu từ khách hàng (đợi xuất HĐ)
-- Có TK 156: Giảm hàng hóa trong kho
-- Có TK 33311: Ghi nhận thuế GTGT đầu ra
 - Nợ TK 632: Ghi nhận giá vốn hàng bán
+- Có TK 156: Giảm hàng hóa trong kho
+- Nợ TK 13881: Ghi nhận công nợ tạm phải thu từ khách hàng (đợi xuất HĐ)
+- Có TK 511: Ghi nhận doanh thu bán hàng
 
 4. VÍ DỤ:
 Công ty giao hàng cho khách A, giá trị hàng 500.000.000đ, giá vốn 300.000.000đ, thuế GTGT 50.000.000đ (chưa xuất HĐ).
-- Nợ TK 13881: 550.000.000đ
+- Nợ TK 632: 300.000.000đ
 - Có TK 156: 500.000.000đ
-- Có TK 33311: 50.000.000đ
-- Nợ TK 632: 300.000.000đ""",
+- Nợ TK 13881: 550.000.000đ
+- Có TK 511: 500.000.000đ""",
 
     "SALES_INVOICE": """1. TÊN NGHIỆP VỤ:
 Xuất hóa đơn bán hàng (đối chiếu giao hàng chưa xuất HĐ)
@@ -73,20 +75,17 @@ Khách hàng A thanh toán 50.000.000đ cho công nợ.
 Nhập kho mua hàng (chưa nhận hóa đơn)
 
 2. BẢNG BÚT TOÁN:
-- Nợ TK 152: Nguyên vật liệu
-- Nợ TK 153: Thuế GTGT đầu vào
+- Nợ TK 152 (*): Nguyên vật liệu
 - Có TK 33881: Phải trả tạm (Nhập hàng chưa có HĐ)
 
 3. GIẢI THÍCH:
 - Nợ TK 152: Ghi nhận hàng hóa nhập kho
-- Nợ TK 153: Ghi nhận thuế GTGT đầu vào được khấu trừ
 - Có TK 33881: Ghi nhận công nợ tạm phải trả NCC (đợi nhận HĐ)
 
 4. VÍ DỤ:
-Nhập 500kg nguyên liệu giá 200.000đ/kg (tổng 100.000.000đ), thuế GTGT 10.000.000đ, chưa nhận hóa đơn.
+Nhập 500kg nguyên liệu giá 200.000đ/kg (tổng 100.000.000đ), chưa nhận hóa đơn.
 - Nợ TK 152: 100.000.000đ
-- Nợ TK 153: 10.000.000đ
-- Có TK 33881: 110.000.000đ""",
+- Có TK 33881: 100.000.000đ""",
 
     "PURCHASE_INVOICE": """1. TÊN NGHIỆP VỤ:
 Nhận hóa đơn mua hàng (đối chiếu nhập hàng chưa có HĐ)

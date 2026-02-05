@@ -256,10 +256,28 @@ class ModuleRouter:
             if agent:
                 from ..agents.base import AgentContext
                 from ..services.session_manager import get_session_manager
+                import uuid
 
-                # Load history từ session
+                # Auto-generate session_id nếu không có
+                if not session_id:
+                    session_id = str(uuid.uuid4())[:8]
+                    print(f"[ModuleRouter] Generated new session_id: {session_id}")
+
+                # Debug session_id
+                print(f"[ModuleRouter] GENERAL mode - session_id='{session_id}', chat_type='{chat_type}'")
+
+                # Load history từ session - chỉ lấy 10 tin nhắn gần nhất
                 sm = get_session_manager(chat_type or "thinking")
                 history_data = sm.get_history(session_id or "", max_count=10) if session_id else []
+
+                # Summary nếu quá nhiều tin nhắn (tiết kiệm token)
+                # Early trigger: > 3 tin nhắn (người dùng nói summary sớm)
+                if history_data and len(history_data) > 3:
+                    original_count = len(history_data)
+                    history_data = self._summarize_history(history_data)
+                    print(f"[ModuleRouter] Summary: {original_count} messages → {len(history_data)} (saved ~{original_count - len(history_data)} messages)")
+
+                print(f"[ModuleRouter] GENERAL mode - loaded {len(history_data)} messages from history")
 
                 # Convert history sang format cho AgentContext
                 history = []
@@ -276,12 +294,20 @@ class ModuleRouter:
                     chat_type=chat_type or "thinking",
                     item_group=item_group or "GOODS",
                     partner_group=partner_group or "CUSTOMER",
-                    history=history,
-                    skip_cache=True  # GENERAL_FREE không dùng cache
+                    history=history
                 )
 
+                # Collect full response để lưu vào session
+                full_response = ""
                 for chunk in agent.stream_execute(context):
+                    full_response += chunk
                     yield chunk
+
+                # Lưu response vào session/history sau khi stream xong
+                if session_id:
+                    sm.add_message(session_id, question, full_response, "GENERAL_FREE")
+                    print(f"[ModuleRouter] Saved to session {session_id[:8]}...")
+
                 return
             else:
                 # Fallback nếu không có agent
@@ -315,6 +341,67 @@ class ModuleRouter:
             return "Rất vui được giúp đỡ bạn! Cần hỗ trợ thêm gì không?"
 
         return f"Hiểu câu hỏi: {question}. Tôi có thể giúp bạn tìm thông tin về kế toán, tài khoản, hạch toán..."
+
+    def _summarize_history(self, history_data: list) -> list:
+        """
+        Summary lịch sử trò chuyện nếu quá dài để tiết kiệm token.
+
+        Strategy - Early trigger, nhiều context hơn:
+        - Trigger khi > 3 tin nhắn (thay vì > 5)
+        - Giữ 5 tin nhắn gần nhất
+        - Summary các tin nhắn cũ với đầy đủ context
+
+        Args:
+            history_data: List of history items (mới nhất → cũ nhất)
+
+        Returns:
+            List summary messages (giữ format {role, content})
+        """
+        if not history_data:
+            return history_data
+
+        # Early trigger: > 3 messages thay vì > 5
+        if len(history_data) <= 3:
+            return history_data
+
+        # Giữ 5 tin nhắn gần nhất (context mới nhất)
+        recent = history_data[:5]
+
+        # Summary các tin nhắn cũ hơn (từ thứ 6 trở đi)
+        older = history_data[5:]
+
+        # Tạo summary chi tiết hơn
+        summary_parts = []
+        user_msgs = [h.get("content", "") for h in older if h.get("role") == "user"]
+        asst_msgs = [h.get("content", "") for h in older if h.get("role") == "assistant"]
+
+        # Summary các chủ đề chính
+        if user_msgs:
+            # Lấy keywords chính từ user messages
+            keywords = []
+            for msg in user_msgs:
+                # Trích xuất keywords (các từ quan trọng)
+                words = msg.split()[:5]  # 5 từ đầu tiên làm keywords
+                keywords.extend([w[:20] + "..." if len(w) > 20 else w for w in words])
+
+            # Ghép keywords thành câu
+            if keywords:
+                topics = ", ".join(keywords[:8])  # Max 8 keywords
+                summary_parts.append(f"User đã nói về: {topics}")
+
+        # Summary các response chính của AI
+        if asst_msgs:
+            summary_parts.append(f"AI đã trả lời {len(asst_msgs)} tin")
+
+        # Tạo summary text
+        if summary_parts:
+            summary_text = f"[Hội thoại trước: {' | '.join(summary_parts)}]"
+        else:
+            summary_text = "[Hội thoại trước: các tin nhắn cũ]"
+
+        summary_msg = {"role": "system", "content": summary_text}
+
+        return recent + [summary_msg]
 
 
 # =============================================================================

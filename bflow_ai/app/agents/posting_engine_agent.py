@@ -325,17 +325,26 @@ class PostingEngineAgent(BaseAgent):
         # 2. Resolve
         entries = PostingEngineResolver.resolve(tx, item_group, partner_group)
 
-        # 3. Build entries text
+        # 3. Build entries text and list LOOKUP accounts
         entries_list = []
+        lookup_accounts = []
         for e in sorted(entries, key=lambda x: x["priority"]):
             acc = e["account"]
             acc_name = ACCOUNT_NAMES.get(acc, acc)
             side = "Nợ" if e["side"] == "DEBIT" else "Có"
             marker = " (*)" if e.get("is_lookup") else ""
             entries_list.append(f"- {side} TK {acc}: {acc_name}{marker}")
+            if e.get("is_lookup"):
+                lookup_accounts.append(f"TK {acc}")
 
         entries_text = "\n".join(entries_list)
         tx_name = TRANSACTION_NAMES.get(tx, tx)
+
+        # Build lookup instructions
+        lookup_instruction = ""
+        if lookup_accounts:
+            lookup_instruction = f"\n\nQUAN TRỌNG: Các tài khoản {', '.join(lookup_accounts)} là LOOKUP (phải có dấu *). PHẢI đánh dấu (*) sau tên tài khoản này trong phần 2. BẢNG BÚT TOÁN."
+
         # Dùng template cụ thể cho từng nghiệp vụ
         response_template = get_response_template(tx)
 
@@ -357,6 +366,7 @@ NGHIỆP VỤ: {tx_name}
 
 BÚT TOÁN TỪ HỆ THỐNG (chỉ sử dụng các bút toán này):
 {entries_text}
+{lookup_instruction}
 
 YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
 {response_template}"""
@@ -406,17 +416,26 @@ YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
         # 2. Resolve
         entries = PostingEngineResolver.resolve(tx, item_group, partner_group)
 
-        # 3. Build entries text
+        # 3. Build entries text and list LOOKUP accounts
         entries_list = []
+        lookup_accounts = []
         for e in sorted(entries, key=lambda x: x["priority"]):
             acc = e["account"]
             acc_name = ACCOUNT_NAMES.get(acc, acc)
             side = "Nợ" if e["side"] == "DEBIT" else "Có"
             marker = " (*)" if e.get("is_lookup") else ""
             entries_list.append(f"- {side} TK {acc}: {acc_name}{marker}")
+            if e.get("is_lookup"):
+                lookup_accounts.append(f"TK {acc}")
 
         entries_text = "\n".join(entries_list)
         tx_name = TRANSACTION_NAMES.get(tx, tx)
+
+        # Build lookup instructions
+        lookup_instruction = ""
+        if lookup_accounts:
+            lookup_instruction = f"\n\nQUAN TRỌNG: Các tài khoản {', '.join(lookup_accounts)} là LOOKUP (phải có dấu *). PHẢI đánh dấu (*) sau tên tài khoản này trong phần 2. BẢNG BÚT TOÁN."
+
         # Dùng template cụ thể cho từng nghiệp vụ
         response_template = get_response_template(tx)
 
@@ -438,6 +457,7 @@ NGHIỆP VỤ: {tx_name}
 
 BÚT TOÁN TỪ HỆ THỐNG (chỉ sử dụng các bút toán này):
 {entries_text}
+{lookup_instruction}
 
 YÊU CẦU: Trả lời ĐẦY ĐỦ 4 phần theo đúng format sau:
 {response_template}"""
