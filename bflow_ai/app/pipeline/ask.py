@@ -31,20 +31,16 @@ class SessionManagerStep:
         self.sm = get_session_manager(chat_type)
         self.chat_type = chat_type
 
-    def create_session_if_needed(self, session_id: str = None, turn_off: bool = False) -> str:
+    def create_session_if_needed(self, session_id: str = None) -> str:
         """
         Tạo session mới nếu chưa có.
 
         Args:
             session_id: Session ID hiện tại (None nếu chưa có)
-            turn_off: Bypass bước này nếu True
 
         Returns:
             session_id: Session ID (mới hoặc cũ)
         """
-        if turn_off:
-            return session_id or "dummy_session"
-
         if not session_id:
             session_id = self.sm.create_session()
             print(f"[SessionStep] Created new session: {session_id}")
@@ -53,38 +49,30 @@ class SessionManagerStep:
 
         return session_id
 
-    def get_session_history(self, session_id: str, max_count: int = 10, turn_off: bool = False) -> list:
+    def get_session_history(self, session_id: str, max_count: int = 10) -> list:
         """
         Lấy history của session.
 
         Args:
             session_id: Session ID
             max_count: Số message tối đa lấy
-            turn_off: Bypass, trả về list rỗng
 
         Returns:
             List of message dicts
         """
-        if turn_off:
-            return []
-
         return self.sm.get_history(session_id, max_count=max_count)
 
-    def format_history_for_llm(self, session_id: str, max_count: int = 10, turn_off: bool = False) -> list:
+    def format_history_for_llm(self, session_id: str, max_count: int = 10) -> list:
         """
         Format history thành dạng messages cho LLM.
 
         Args:
             session_id: Session ID
             max_count: Số message tối đa
-            turn_off: Bypass, trả về list rỗng
 
         Returns:
             List of {"role": "user/assistant", "content": "..."} dicts
         """
-        if turn_off:
-            return []
-
         return self.sm.get_messages_format(session_id, max_count=max_count)
 
     def save_message_to_history(
@@ -93,7 +81,6 @@ class SessionManagerStep:
         question: str,
         response: str,
         agent_name: str,
-        turn_off: bool = False
     ) -> None:
         """
         Lưu message vào history.
@@ -103,11 +90,7 @@ class SessionManagerStep:
             question: Câu hỏi
             response: Trả lời
             agent_name: Tên agent đã xử lý
-            turn_off: Bypass, không lưu
         """
-        if turn_off:
-            return
-
         self.sm.add_message(session_id, question, response, agent_name)
         print(f"[SessionStep] Saved message to session {session_id}")
 
@@ -130,7 +113,8 @@ class ContextBuilderStep:
         self,
         question: str,
         session_id: str,
-        chat_type: str,
+        user_id: str = None,
+        chat_type: str = "thinking",
         item_group: str = "GOODS",
         partner_group: str = "CUSTOMER",
         history: list = None
@@ -141,6 +125,7 @@ class ContextBuilderStep:
         Args:
             question: Câu hỏi
             session_id: Session ID
+            user_id: User ID (phân quyền)
             chat_type: Loại chat (thinking/free)
             item_group: Nhóm sản phẩm
             partner_group: Nhóm đối tác
@@ -158,11 +143,13 @@ class ContextBuilderStep:
             mode_desc = "THINKING - Phân loại thông minh"
 
         print(f"[ContextStep] Building context for: {mode_desc}")
+        print(f"[ContextStep] User ID: {user_id}")
 
         # === BUILD CONTEXT OBJECT ===
         context = AgentContext(
             question=question,
             session_id=session_id,
+            user_id=user_id,
             chat_type=chat_type,
             item_group=item_group,
             partner_group=partner_group,
@@ -195,20 +182,12 @@ class AgentRouterStep:
     def route_to_agent(
         self,
         context,
-        use_fast_rules: bool = True,
-        use_slm_classification: bool = True,
-        use_semantic_fallback: bool = True,
-        turn_off_routing: bool = False
     ):
         """
         Route câu hỏi đến agent phù hợp.
 
         Args:
             context: AgentContext object
-            use_fast_rules: Dùng rule-based nhanh
-            use_slm_classification: Dùng SLM để classify
-            use_semantic_fallback: Fallback với semantic similarity
-            turn_off_routing: Bypass, trả về GENERAL_FREE
 
         Returns:
             BaseAgent object
@@ -216,27 +195,24 @@ class AgentRouterStep:
         from ..agents.base import BaseAgent
 
         # === CHẾ ĐỘ FREE: BỎ QUA ROUTING ===
-        if context.chat_type == "free" or turn_off_routing:
+        if context.chat_type == "free":
             print("[RouterStep] Mode: FREE - Using GENERAL_FREE agent")
             return self.orchestrator.get_agent("GENERAL_FREE")
 
         # === STEP 3.1: FAST RULE-BASED ROUTING (O(1)) ===
-        if use_fast_rules:
-            agent = self._fast_rule_based_routing(context)
-            if agent:
-                return agent
+        agent = self._fast_rule_based_routing(context)
+        if agent:
+            return agent
 
         # === STEP 3.2: SLM CLASSIFICATION ===
-        if use_slm_classification:
-            agent = self._slm_classification(context)
-            if agent:
-                return agent
+        agent = self._slm_classification(context)
+        if agent:
+            return agent
 
         # === STEP 3.3: SEMANTIC FALLBACK ===
-        if use_semantic_fallback:
-            agent = self._semantic_fallback(context)
-            if agent:
-                return agent
+        agent = self._semantic_fallback(context)
+        if agent:
+            return agent
 
         # === STEP 3.4: FINAL FALLBACK ===
         print("[RouterStep] Using fallback: GENERAL_ACCOUNTING")
@@ -473,7 +449,6 @@ class HistorySearchStep:
         session_id: str,
         agent_name: str,
         chat_type: str = "thinking",
-        turn_off: bool = False
     ):
         """
         Kiểm tra history bằng semantic similarity.
@@ -483,14 +458,10 @@ class HistorySearchStep:
             session_id: Session ID
             agent_name: Tên agent
             chat_type: Loại chat
-            turn_off: Bypass kiểm tra history
 
         Returns:
             Response từ history nếu có match, None nếu không
         """
-        if turn_off:
-            return None
-
         if not session_id:
             return None
 
@@ -590,7 +561,6 @@ class StreamingCacheStep:
         question: str,
         agent_name: str,
         cache_context: dict,
-        turn_off: bool = False
     ):
         """
         Kiểm tra cache cho question.
@@ -601,13 +571,10 @@ class StreamingCacheStep:
             question: Câu hỏi
             agent_name: Tên agent
             cache_context: Context dict (item_group, partner_group, etc.)
-            turn_off: Bypass cache check
 
         Returns:
             Generator yielding chunks từ cache + example mới (hoặc None nếu cache miss)
         """
-        if turn_off:
-            return None
 
         # === GENERATE CACHE KEY ===
         cache_key = self._generate_cache_key(question, agent_name, cache_context)
@@ -941,7 +908,6 @@ class AgentExecutorStep:
         self,
         agent,
         context,
-        turn_off_llm: bool = False
     ):
         """
         Thực thi agent và stream response.
@@ -949,17 +915,11 @@ class AgentExecutorStep:
         Args:
             agent: BaseAgent instance
             context: AgentContext
-            turn_off_llm: Bypass LLM call (cho testing)
 
         Yields:
             Response chunks from agent (or LLM)
         """
         print(f"[ExecutorStep] Executing agent: {agent.name}")
-
-        if turn_off_llm:
-            # Mock response cho testing
-            yield f"[Mock response from {agent.name}]"
-            return
 
         # === AGENT STREAM EXECUTE ===
         for chunk in agent.stream_execute(context):
@@ -1039,7 +999,7 @@ class ResponseSaverStep:
         item_group: str = "GOODS",
         partner_group: str = "CUSTOMER",
         chat_type: str = "thinking",
-        turn_off_saving: bool = False
+        user_id: str = None,
     ):
         """
         Lưu response vào cache và history.
@@ -1053,10 +1013,8 @@ class ResponseSaverStep:
             item_group: Nhóm sản phẩm
             partner_group: Nhóm đối tác
             chat_type: Loại chat
-            turn_off_saving: Bypass saving
+            user_id: User ID
         """
-        if turn_off_saving:
-            return
 
         # === ACCUMULATE FULL RESPONSE ===
         full_response = "".join(response_chunks)
@@ -1072,7 +1030,7 @@ class ResponseSaverStep:
         # === SAVE TO HISTORY ===
         from ..services.session_manager import get_session_manager
         sm = get_session_manager("thinking")
-        sm.add_message(session_id, question, full_response, agent_name)
+        sm.add_message(session_id, question, full_response, agent_name, user_id=user_id)
 
         print(f"[SaverStep] Saved response ({len(full_response)} chars)")
 
@@ -1115,43 +1073,36 @@ class AccountingPipeline:
     def process(
         self,
         question: str,
+        user_id: str = None,
         session_id: str = None,
         chat_type: str = "thinking",
         item_group: str = "GOODS",
         partner_group: str = "CUSTOMER",
-
-        # Optional flags để turn off các steps
-        turn_off_session: bool = False,
-        turn_off_routing: bool = False,
-        turn_off_history_check: bool = False,
-        turn_off_cache: bool = False,
-        turn_off_llm: bool = False,
-        turn_off_stream_processing: bool = False,
-        turn_off_saving: bool = False
     ):
         """
         Xử lý question và stream response.
 
         Args:
             question: Câu hỏi
+            user_id: User ID (phân quyền)
             session_id: Session ID
             chat_type: Loại chat
             item_group: Nhóm sản phẩm
             partner_group: Nhóm đối tác
-            turn_off_*: Flags để bypass các bước
 
         Yields:
             str: Response chunks (từng chữ một)
         """
         print(f"\n{'='*60}")
         print(f"[Pipeline] Processing: {question}")
+        print(f"[Pipeline] User ID: {user_id}")
         print(f"{'='*60}\n")
 
         # =========================================================================
         # STEP 1: SESSION MANAGEMENT
         # =========================================================================
         print("[Pipeline] STEP 1: Session Management")
-        session_id = self.session_step.create_session_if_needed(session_id, turn_off=turn_off_session)
+        session_id = self.session_step.create_session_if_needed(session_id)
         yield f"__SESSION_ID__:{session_id}\n"
 
         # =========================================================================
@@ -1159,11 +1110,12 @@ class AccountingPipeline:
         # =========================================================================
         print("[Pipeline] STEP 2: Building Context")
         history_messages = self.session_step.format_history_for_llm(
-            session_id, max_count=10, turn_off=turn_off_session
+            session_id, max_count=10
         )
         context = self.context_step.build_context(
             question=question,
             session_id=session_id,
+            user_id=user_id,
             chat_type=chat_type,
             item_group=item_group,
             partner_group=partner_group,
@@ -1178,7 +1130,7 @@ class AccountingPipeline:
             agent = self.router_step.orchestrator.get_agent("GENERAL_FREE")
 
             response_chunks = []
-            for chunk in self.executor.execute_agent(agent, context, turn_off_llm):
+            for chunk in self.executor.execute_agent(agent, context):
                 response_chunks.append(chunk)
                 yield chunk
 
@@ -1188,7 +1140,7 @@ class AccountingPipeline:
                 item_group=item_group,
                 partner_group=partner_group,
                 chat_type=chat_type,
-                turn_off_saving=turn_off_saving
+                user_id=user_id,
             )
             return
 
@@ -1196,7 +1148,7 @@ class AccountingPipeline:
         # STEP 3: ROUTE TO AGENT
         # =========================================================================
         print("[Pipeline] STEP 3: Routing to Agent")
-        agent = self.router_step.route_to_agent(context, turn_off_routing=turn_off_routing)
+        agent = self.router_step.route_to_agent(context)
         agent_name = agent.name
 
         # =========================================================================
@@ -1211,7 +1163,6 @@ class AccountingPipeline:
                 "partner_group": partner_group,
                 "chat_type": chat_type
             },
-            turn_off=turn_off_cache
         )
 
         if cached_stream_gen is not None:
@@ -1233,7 +1184,7 @@ class AccountingPipeline:
         response_chunks = []
 
         # Execute agent và stream response
-        llm_stream = self.executor.execute_agent(agent, context, turn_off_llm=turn_off_llm)
+        llm_stream = self.executor.execute_agent(agent, context)
 
         # =========================================================================
         # STEP 6: STREAM PROCESSING
@@ -1256,7 +1207,7 @@ class AccountingPipeline:
             item_group=item_group,
             partner_group=partner_group,
             chat_type=chat_type,
-            turn_off_saving=turn_off_saving
+            user_id=user_id,
         )
 
         print(f"[Pipeline] ✓ Completed. Total response: {len(''.join(response_chunks))} chars")

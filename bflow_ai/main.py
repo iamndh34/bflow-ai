@@ -1,13 +1,13 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from app.api.endpoints.ask import router as unified_router
+from app.api.endpoints.ask import router as ask_router
+from app.api.endpoints.sessions import router as sessions_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.mongodb import close_mongo_connection
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup - Clear all caches
     print("=" * 60)
     print("[Startup] Clearing all caches...")
     try:
@@ -30,14 +30,14 @@ async def lifespan(app: FastAPI):
     print("=" * 60)
 
     yield
-    # Shutdown - đóng MongoDB connection
+
     await close_mongo_connection()
 
 
 app = FastAPI(
     title="BFLOW AI",
-    description="Unified Multi-Module AI Assistant - Pipeline Architecture",
-    version="1.0",
+    description="Unified Multi-Module AI Assistant - RESTful API",
+    version="2.0",
     lifespan=lifespan
 )
 
@@ -49,27 +49,39 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include unified endpoint
-app.include_router(unified_router, prefix="/api/ai-bflow")
+app.include_router(ask_router, prefix="/api/ai-bflow")
+app.include_router(sessions_router, prefix="/api/ai-bflow")
 
 
 @app.get("/")
 async def root():
     return {
-        "message": "BFLOW AI - Unified Multi-Module Architecture",
-        "endpoints": {
-            "unified": "/api/ai-bflow/ask",
-            "description": "Single endpoint for all modules (Accounting, HR, CRM, etc)"
+        "message": "BFLOW AI - RESTful API",
+        "version": "2.0",
+        "authentication": {
+            "method": "X-User-Id header",
+            "description": "User ID passed via header for all requests"
         },
-        "modules": [
-            "ACCOUNTING - Kế toán, tài khoản, hạch toán",
-            "GENERAL - Câu hỏi chung"
-        ],
-        "features": [
-            "Module Router - Auto route to appropriate module",
-            "Hybrid Semantic History Matching",
-            "Streaming Cache with Simulation",
-            "Multi-Agent System",
-            "Optimized Vector Search"
-        ]
+        "endpoints": {
+            "ask": {
+                "method": "POST",
+                "path": "/api/ai-bflow/ask",
+                "header": "X-User-Id (required)",
+                "body": {
+                    "question": "string (required)",
+                    "session_id": "string (optional)",
+                    "chat_type": "thinking|free (default: thinking)",
+                    "item_group": "GOODS (default)",
+                    "partner_group": "CUSTOMER (default)"
+                }
+            },
+            "sessions": {
+                "list": {"method": "GET", "path": "/api/ai-bflow/users/{user_id}/sessions"},
+                "create": {"method": "POST", "path": "/api/ai-bflow/users/{user_id}/sessions"},
+                "detail": {"method": "GET", "path": "/api/ai-bflow/users/{user_id}/sessions/{session_id}"},
+                "delete": {"method": "DELETE", "path": "/api/ai-bflow/users/{user_id}/sessions/{session_id}"},
+                "clear": {"method": "POST", "path": "/api/ai-bflow/users/{user_id}/sessions/{session_id}/clear"},
+                "reload": {"method": "POST", "path": "/api/ai-bflow/users/{user_id}/sessions/{session_id}/reload"}
+            }
+        }
     }

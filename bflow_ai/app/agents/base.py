@@ -54,6 +54,7 @@ class AgentContext:
     """Context truyền giữa các agents"""
     question: str
     session_id: Optional[str] = None
+    user_id: Optional[str] = None  # User ID cho phân quyền
     chat_type: str = "thinking"
     item_group: Optional[str] = None  # Chỉ PostingEngineAgent cần
     partner_group: Optional[str] = None  # Chỉ PostingEngineAgent cần

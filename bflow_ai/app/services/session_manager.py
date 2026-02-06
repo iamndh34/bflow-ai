@@ -44,11 +44,12 @@ class SessionManager:
         except Exception as e:
             print(f"[SessionManager] Error saving session {session_id}: {e}")
 
-    def create_session(self) -> str:
+    def create_session(self, user_id: str = None) -> str:
         """Tạo session mới, trả về session_id."""
         session_id = f"sess_{uuid.uuid4().hex[:12]}"
         data = {
             "id": session_id,
+            "user_id": user_id,
             "chat_type": self.chat_type,
             "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -56,19 +57,19 @@ class SessionManager:
             "history": []
         }
         self._save_session(session_id, data)
-        print(f"[SessionManager] Created session: {session_id}")
+        print(f"[SessionManager] Created session: {session_id} (user: {user_id})")
         return session_id
 
     def get_session(self, session_id: str) -> Optional[dict]:
         """Lấy thông tin session."""
         return self._load_session(session_id)
 
-    def add_message(self, session_id: str, question: str, response: str, category: str = "GENERAL"):
+    def add_message(self, session_id: str, question: str, response: str, category: str = "GENERAL", user_id: str = None):
         """Thêm cặp Q&A vào session."""
         data = self._load_session(session_id)
         if not data:
             # Tự tạo session nếu chưa có
-            session_id = self.create_session()
+            session_id = self.create_session(user_id=user_id)
             data = self._load_session(session_id)
 
         data["history"].append({
@@ -78,6 +79,10 @@ class SessionManager:
             "category": category
         })
         data["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Cập nhật user_id nếu có
+        if user_id:
+            data["user_id"] = user_id
 
         # Cập nhật title theo câu hỏi gần nhất
         data["title"] = question[:50] + "..." if len(question) > 50 else question
@@ -114,8 +119,12 @@ class SessionManager:
             print(f"[SessionManager] Error deleting session {session_id}: {e}")
         return False
 
-    def list_sessions(self) -> list:
-        """Liệt kê tất cả sessions, sắp xếp theo updated_at mới nhất."""
+    def list_sessions(self, user_id: str = None) -> list:
+        """Liệt kê tất cả sessions, sắp xếp theo updated_at mới nhất.
+
+        Args:
+            user_id: Nếu có, chỉ trả về sessions của user đó
+        """
         sessions = []
         try:
             for filename in os.listdir(self.sessions_dir):
@@ -123,8 +132,13 @@ class SessionManager:
                     session_id = filename[:-5]  # Bỏ .json
                     data = self._load_session(session_id)
                     if data:
+                        # Lọc theo user_id nếu có
+                        if user_id and data.get("user_id") != user_id:
+                            continue
+
                         sessions.append({
                             "id": data.get("id", session_id),
+                            "user_id": data.get("user_id", ""),
                             "title": data.get("title", "Untitled"),
                             "chat_type": data.get("chat_type", self.chat_type),
                             "created_at": data.get("created_at", ""),

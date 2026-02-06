@@ -214,17 +214,18 @@ class ModuleRouter:
     def route_and_process(
         self,
         question: str,
+        user_id: str = None,
         session_id: str = None,
         chat_type: str = "thinking",
         item_group: str = "GOODS",
         partner_group: str = "CUSTOMER",
-        **kwargs
     ) -> Generator[str, None, None]:
         """
         Route câu hỏi đến module phù hợp và xử lý.
 
         Args:
             question: Câu hỏi
+            user_id: User ID (phân quyền)
             session_id: Session ID
             chat_type: Loại chat
             item_group: Nhóm sản phẩm
@@ -236,6 +237,7 @@ class ModuleRouter:
         """
         print(f"\n{'='*60}")
         print(f"[ModuleRouter] Processing: {question}")
+        print(f"[ModuleRouter] User ID: {user_id}")
         print(f"{'='*60}\n")
 
         # Step 1: Phân loại module
@@ -305,7 +307,7 @@ class ModuleRouter:
 
                 # Lưu response vào session/history sau khi stream xong
                 if session_id:
-                    sm.add_message(session_id, question, full_response, "GENERAL_FREE")
+                    sm.add_message(session_id, question, full_response, "GENERAL_FREE", user_id=user_id)
                     print(f"[ModuleRouter] Saved to session {session_id[:8]}...")
 
                 return
@@ -319,11 +321,11 @@ class ModuleRouter:
         # Step 3: Process qua pipeline
         for chunk in pipeline.process(
             question=question,
+            user_id=user_id,
             session_id=session_id,
             chat_type=chat_type,
             item_group=item_group,
             partner_group=partner_group,
-            **kwargs
         ):
             yield chunk
 
