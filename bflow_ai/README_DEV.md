@@ -120,7 +120,7 @@ curl -X DELETE "http://localhost:8000/api/ai-bflow/users/user123/sessions/sess_a
 - FastAPI, Python 3.11+, Pydantic
 
 **AI/ML:**
-- Ollama (qwen2.5:3b cho generation, qwen2.5:0.5b cho classification)
+- Ollama (qwen2.5:1.5b cho generation, qwen2.5:0.5b cho classification)
 - Sentence-Transformers (Vietnamese embeddings)
 
 **Cache/Storage:**

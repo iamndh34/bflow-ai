@@ -29,7 +29,7 @@ class CachedLLMService:
 
         # Chat với cache
         response = service.chat(
-            model="qwen2.5:3b",
+            model="qwen2.5:1.5b",
             messages=[{"role": "user", "content": "Hello"}],
             use_cache=True
         )

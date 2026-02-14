@@ -58,34 +58,11 @@ async def ai_bflow_ask(request: AskRequest):
             # Run graph với streaming
             config = {"configurable": {"thread_id": request.session_id or "default"}}
 
+            # Run graph và get final state
             final_state = None
             async for chunk in graph.astream(initial_state, config):
                 for node_name, node_state in chunk.items():
                     final_state = node_state
-
-                    # Stream intermediate steps character-by-character
-                    if node_name == "retrieve":
-                        msg = "\n🔍 Đang tìm tài khoản...\n"
-                        for char in msg:
-                            yield char
-                            await asyncio.sleep(0.01)
-                    elif node_name == "generate_draft":
-                        msg = "\n🤖 Đang sinh câu trả lời...\n"
-                        for char in msg:
-                            yield char
-                            await asyncio.sleep(0.01)
-                    elif node_name == "grade_answer":
-                        confidence = node_state.get("confidence", 0)
-                        msg = f"\n📊 Confidence: {confidence:.2f}\n"
-                        for char in msg:
-                            yield char
-                            await asyncio.sleep(0.01)
-                    elif node_name == "rewrite_query":
-                        retry = node_state.get("retry_count", 0)
-                        msg = f"\n✍️  Đã rewrite query (lần {retry})...\n"
-                        for char in msg:
-                            yield char
-                            await asyncio.sleep(0.01)
 
             # Stream final answer token-by-token
             if final_state and final_state.get("answer"):

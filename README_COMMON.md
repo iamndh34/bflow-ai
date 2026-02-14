@@ -131,7 +131,7 @@ bflow-ai/
 curl -fsSL https://ollama.com/install.sh | sh
 
 # Pull models
-ollama pull qwen2.5:3b
+ollama pull qwen2.5:1.5b
 ollama pull qwen2.5:0.5b
 ollama pull nomic-embed-text  # Cho v2
 ```
@@ -219,7 +219,7 @@ curl http://localhost:8010/api/graph/status
 ```python
 # Ollama
 OLLAMA_HOST = "http://localhost:11434"
-LLM_MODEL = "qwen2.5:3b"
+LLM_MODEL = "qwen2.5:1.5b"
 
 # Cache
 ENABLE_LLM_CACHE = True
@@ -231,7 +231,7 @@ CACHE_TTL = 3600
 ```python
 # Ollama
 OLLAMA_HOST = "http://localhost:11434"
-LLM_MODEL = "qwen2.5:3b"
+LLM_MODEL = "qwen2.5:1.5b"
 GRAPH_RAG_EMBEDDING_MODEL = "nomic-embed-text"
 
 # GraphRAG

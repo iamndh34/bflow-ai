@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     # Ollama/LLM
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    GENERATION_MODEL: str = "qwen2.5:3b"
+    GENERATION_MODEL: str = "qwen2.5:1.5b"
     EMBEDDING_MODEL: str = "nomic-embed-text"
 
     # Ollama options

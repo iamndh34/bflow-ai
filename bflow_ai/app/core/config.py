@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     # Model config
     CLASSIFIER_MODEL: str = "qwen2.5:0.5b"
-    GENERATION_MODEL: str = "qwen2.5:3b"
+    GENERATION_MODEL: str = "qwen2.5:1.5b"
 
     # Ollama generation options
     OLLAMA_OPTIONS: dict = {
