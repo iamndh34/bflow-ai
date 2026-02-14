@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.env
+.venv
+venv/
+
+ragtest/output/
+ragtest/cache/
+chroma_db/
+*.log
+
+*.graphml
+*.parquet
+artifacts/
+
+models/
+.cache/

@@ -40,7 +40,7 @@ UI Client → GET /api/ai-bflow/ask
                 ↓
         Multi-Agent Execution (COA, POSTING_ENGINE, GENERAL)
                 ↓
-        Ollama LLM (qwen2.5:3b)
+        Ollama LLM (qwen2.5:7b)
                 ↓
         Hybrid Cache (Redis + Memory)
                 ↓
@@ -55,7 +55,7 @@ UI Client → GET /api/ai-bflow/ask
 - FastAPI, Python 3.11+, Pydantic
 
 **AI/ML:**
-- Ollama (qwen2.5:3b, qwen2.5:0.5b)
+- Ollama (qwen2.5:7b, qwen2.5:0.5b)
 - Sentence-Transformers (Vietnamese embeddings)
 
 **Cache/Storage:**
@@ -110,7 +110,7 @@ REDIS_PORT=6379
 
 # Models
 CLASSIFIER_MODEL=qwen2.5:0.5b
-GENERATION_MODEL=qwen2.5:3b
+GENERATION_MODEL=qwen2.5:7b
 
 # Cache
 ENABLE_LLM_CACHE=true
@@ -132,7 +132,7 @@ pip install -r requirements.txt
 
 # Install Ollama
 curl -fsSL https://ollama.com/install.sh | sh
-ollama pull qwen2.5:3b
+ollama pull qwen2.5:7b
 
 # Run server
 uvicorn main:app --port 8010

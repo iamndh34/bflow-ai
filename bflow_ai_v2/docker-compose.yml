@@ -1,0 +1,49 @@
+# =============================================================================
+# bflow_ai_v2 - Docker Compose
+# =============================================================================
+version: '3.8'
+
+services:
+  # Ollama Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: bflow_v2_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    restart: unless-stopped
+    networks:
+      - bflow_v2_network
+
+  # bflow_ai_v2 App
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bflow_v2_app
+    ports:
+      - "8010:8010"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - HOST=0.0.0.0
+      - PORT=8010
+      - GENERATION_MODEL=gemma3:4b
+    depends_on:
+      ollama:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - bflow_v2_network
+    volumes:
+      - ./data:/app/data
+
+volumes:
+  ollama_data:
+    driver: local
+
+networks:
+  bflow_v2_network:
+    driver: bridge

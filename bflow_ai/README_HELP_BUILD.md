@@ -90,7 +90,7 @@ MONGO_URL=mongodb://mis_mongo:27017/bflow_db
 # =============================================================================
 OLLAMA_HOST=http://mis_ollama:11434
 CLASSIFIER_MODEL=qwen2.5:0.5b
-GENERATION_MODEL=qwen2.5:3b
+GENERATION_MODEL=qwen2.5:7b
 
 # =============================================================================
 # Cache - Redis
@@ -239,11 +239,11 @@ docker-compose up -d --build <service_name>
 docker exec -it mis_ollama bash
 
 # Tải model thủ công
-ollama pull qwen2.5:3b
+ollama pull qwen2.5:7b
 ollama pull qwen2.5:0.5b
 
 # Test
-ollama run qwen2.5:3b "Hello"
+ollama run qwen2.5:7b "Hello"
 ```
 
 ### 3. MongoDB connection refused

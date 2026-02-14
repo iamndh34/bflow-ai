@@ -1,0 +1,461 @@
+[
+  {
+    "standard": "TT200",
+    "code": "111",
+    "name": "Tiền mặt",
+    "name_en": "Cash in hand",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "111 - Tiền mặt (Cash in hand)"
+  },
+  {
+    "standard": "TT200",
+    "code": "1111",
+    "name": "Tiền Việt Nam",
+    "name_en": "Vietnam dong",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "1111 - Tiền Việt Nam (Vietnam dong)"
+  },
+  {
+    "standard": "TT200",
+    "code": "1112",
+    "name": "Ngoại tệ",
+    "name_en": "Foreign currency",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "1112 - Ngoại tệ (Foreign currency)"
+  },
+  {
+    "standard": "TT200",
+    "code": "112",
+    "name": "Tiền gửi Ngân hàng",
+    "name_en": "Cash in bank",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "112 - Tiền gửi Ngân hàng (Cash in bank)"
+  },
+  {
+    "standard": "TT200",
+    "code": "1121",
+    "name": "Tiền Việt Nam",
+    "name_en": "Vietnam dong",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "1121 - Tiền Việt Nam (Vietnam dong)"
+  },
+  {
+    "standard": "TT200",
+    "code": "1122",
+    "name": "Ngoại tệ",
+    "name_en": "Foreign currency",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "1122 - Ngoại tệ (Foreign currency)"
+  },
+  {
+    "standard": "TT200",
+    "code": "121",
+    "name": "Chứng khoán kinh doanh",
+    "name_en": "Securities trading",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "121 - Chứng khoán kinh doanh (Securities trading)"
+  },
+  {
+    "standard": "TT200",
+    "code": "131",
+    "name": "Phải thu của khách hàng",
+    "name_en": "Accounts receivable - trade",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "131 - Phải thu của khách hàng (Accounts receivable - trade)"
+  },
+  {
+    "standard": "TT200",
+    "code": "133",
+    "name": "Thuế GTGT được khấu trừ",
+    "name_en": "VAT deducted",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "133 - Thuế GTGT được khấu trừ (VAT deducted)"
+  },
+  {
+    "standard": "TT200",
+    "code": "1331",
+    "name": "Thuế GTGT được khấu trừ của hàng hóa, dịch vụ",
+    "name_en": "VAT deduction of goods, services",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "1331 - Thuế GTGT được khấu trừ của hàng hóa, dịch vụ (VAT deduction of goods, services)"
+  },
+  {
+    "standard": "TT200",
+    "code": "138",
+    "name": "Phải thu khác",
+    "name_en": "Other receivable",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "138 - Phải thu khác (Other receivable)"
+  },
+  {
+    "standard": "TT200",
+    "code": "1388",
+    "name": "Phải thu khác",
+    "name_en": "Other receivable",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "1388 - Phải thu khác (Other receivable)"
+  },
+  {
+    "standard": "TT200",
+    "code": "141",
+    "name": "Tạm ứng",
+    "name_en": "Advances",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "141 - Tạm ứng (Advances)"
+  },
+  {
+    "standard": "TT200",
+    "code": "151",
+    "name": "Hàng mua đang đi đường",
+    "name_en": "Goods in transit",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "151 - Hàng mua đang đi đường (Goods in transit)"
+  },
+  {
+    "standard": "TT200",
+    "code": "152",
+    "name": "Nguyên liệu, vật liệu",
+    "name_en": "Raw materials",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "152 - Nguyên liệu, vật liệu (Raw materials)"
+  },
+  {
+    "standard": "TT200",
+    "code": "153",
+    "name": "Công cụ, dụng cụ",
+    "name_en": "Tools and supplies",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "153 - Công cụ, dụng cụ (Tools and supplies)"
+  },
+  {
+    "standard": "TT200",
+    "code": "154",
+    "name": "Chi phí sản xuất, kinh doanh dở dang",
+    "name_en": "Work in progress",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "154 - Chi phí sản xuất, kinh doanh dở dang (Work in progress)"
+  },
+  {
+    "standard": "TT200",
+    "code": "155",
+    "name": "Thành phẩm",
+    "name_en": "Finished goods",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "155 - Thành phẩm (Finished goods)"
+  },
+  {
+    "standard": "TT200",
+    "code": "156",
+    "name": "Hàng hóa",
+    "name_en": "Merchandise inventory",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "156 - Hàng hóa (Merchandise inventory)"
+  },
+  {
+    "standard": "TT200",
+    "code": "1561",
+    "name": "Giá mua hàng hóa",
+    "name_en": "Price of goods",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "1561 - Giá mua hàng hóa (Price of goods)"
+  },
+  {
+    "standard": "TT200",
+    "code": "157",
+    "name": "Hàng gửi đi bán",
+    "name_en": "Goods on consignment",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "157 - Hàng gửi đi bán (Goods on consignment)"
+  },
+  {
+    "standard": "TT200",
+    "code": "211",
+    "name": "Tài sản cố định hữu hình",
+    "name_en": "Tangible fixed assets",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "211 - Tài sản cố định hữu hình (Tangible fixed assets)"
+  },
+  {
+    "standard": "TT200",
+    "code": "214",
+    "name": "Hao mòn tài sản cố định",
+    "name_en": "Depreciation of fixed assets",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "214 - Hao mòn tài sản cố định (Depreciation of fixed assets)"
+  },
+  {
+    "standard": "TT200",
+    "code": "241",
+    "name": "Xây dựng cơ bản dở dang",
+    "name_en": "Construction in process",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "241 - Xây dựng cơ bản dở dang (Construction in process)"
+  },
+  {
+    "standard": "TT200",
+    "code": "242",
+    "name": "Chi phí trả trước",
+    "name_en": "Prepaid expenses",
+    "type_id": 1,
+    "type_name": "Tài sản",
+    "search_text": "242 - Chi phí trả trước (Prepaid expenses)"
+  },
+  {
+    "standard": "TT200",
+    "code": "331",
+    "name": "Phải trả cho người bán",
+    "name_en": "Payable to seller",
+    "type_id": 2,
+    "type_name": "Nợ phải trả",
+    "search_text": "331 - Phải trả cho người bán (Payable to seller)"
+  },
+  {
+    "standard": "TT200",
+    "code": "333",
+    "name": "Thuế và các khoản phải nộp Nhà nước",
+    "name_en": "Taxes and payable to state budget",
+    "type_id": 2,
+    "type_name": "Nợ phải trả",
+    "search_text": "333 - Thuế và các khoản phải nộp Nhà nước (Taxes and payable to state budget)"
+  },
+  {
+    "standard": "TT200",
+    "code": "3331",
+    "name": "Thuế giá trị gia tăng phải nộp",
+    "name_en": "Value Added Tax",
+    "type_id": 2,
+    "type_name": "Nợ phải trả",
+    "search_text": "3331 - Thuế giá trị gia tăng phải nộp (Value Added Tax)"
+  },
+  {
+    "standard": "TT200",
+    "code": "33311",
+    "name": "Thuế GTGT đầu ra",
+    "name_en": "VAT output",
+    "type_id": 2,
+    "type_name": "Nợ phải trả",
+    "search_text": "33311 - Thuế GTGT đầu ra (VAT output)"
+  },
+  {
+    "standard": "TT200",
+    "code": "334",
+    "name": "Phải trả người lao động",
+    "name_en": "Payable to employees",
+    "type_id": 2,
+    "type_name": "Nợ phải trả",
+    "search_text": "334 - Phải trả người lao động (Payable to employees)"
+  },
+  {
+    "standard": "TT200",
+    "code": "338",
+    "name": "Phải trả, phải nộp khác",
+    "name_en": "Other payable",
+    "type_id": 2,
+    "type_name": "Nợ phải trả",
+    "search_text": "338 - Phải trả, phải nộp khác (Other payable)"
+  },
+  {
+    "standard": "TT200",
+    "code": "3388",
+    "name": "Phải trả, phải nộp khác",
+    "name_en": "Other payable",
+    "type_id": 2,
+    "type_name": "Nợ phải trả",
+    "search_text": "3388 - Phải trả, phải nộp khác (Other payable)"
+  },
+  {
+    "standard": "TT200",
+    "code": "341",
+    "name": "Vay và nợ thuê tài chính",
+    "name_en": "Borrowing and fincance lease liabilities",
+    "type_id": 2,
+    "type_name": "Nợ phải trả",
+    "search_text": "341 - Vay và nợ thuê tài chính (Borrowing and fincance lease liabilities)"
+  },
+  {
+    "standard": "TT200",
+    "code": "411",
+    "name": "Vốn đầu tư của chủ sở hữu",
+    "name_en": "Working capital",
+    "type_id": 3,
+    "type_name": "Vốn chủ sở hữu",
+    "search_text": "411 - Vốn đầu tư của chủ sở hữu (Working capital)"
+  },
+  {
+    "standard": "TT200",
+    "code": "421",
+    "name": "Lợi nhuận sau thuế chưa phân phối",
+    "name_en": "Undistributed earnings",
+    "type_id": 3,
+    "type_name": "Vốn chủ sở hữu",
+    "search_text": "421 - Lợi nhuận sau thuế chưa phân phối (Undistributed earnings)"
+  },
+  {
+    "standard": "TT200",
+    "code": "511",
+    "name": "Doanh thu bán hàng và cung cấp dịch vụ",
+    "name_en": "Sales",
+    "type_id": 4,
+    "type_name": "Doanh thu",
+    "search_text": "511 - Doanh thu bán hàng và cung cấp dịch vụ (Sales)"
+  },
+  {
+    "standard": "TT200",
+    "code": "5111",
+    "name": "Doanh thu bán hàng hóa",
+    "name_en": "Goods sale",
+    "type_id": 4,
+    "type_name": "Doanh thu",
+    "search_text": "5111 - Doanh thu bán hàng hóa (Goods sale)"
+  },
+  {
+    "standard": "TT200",
+    "code": "5112",
+    "name": "Doanh thu bán các thành phẩm",
+    "name_en": "Finished product sale",
+    "type_id": 4,
+    "type_name": "Doanh thu",
+    "search_text": "5112 - Doanh thu bán các thành phẩm (Finished product sale)"
+  },
+  {
+    "standard": "TT200",
+    "code": "5113",
+    "name": "Doanh thu cung cấp dịch vụ",
+    "name_en": "Turnover from service provision",
+    "type_id": 4,
+    "type_name": "Doanh thu",
+    "search_text": "5113 - Doanh thu cung cấp dịch vụ (Turnover from service provision)"
+  },
+  {
+    "standard": "TT200",
+    "code": "515",
+    "name": "Doanh thu hoạt động tài chính",
+    "name_en": "Turnover from financial operations",
+    "type_id": 4,
+    "type_name": "Doanh thu",
+    "search_text": "515 - Doanh thu hoạt động tài chính (Turnover from financial operations)"
+  },
+  {
+    "standard": "TT200",
+    "code": "521",
+    "name": "Các khoản giảm trừ doanh thu",
+    "name_en": "Deduction from income",
+    "type_id": 4,
+    "type_name": "Doanh thu",
+    "search_text": "521 - Các khoản giảm trừ doanh thu (Deduction from income)"
+  },
+  {
+    "standard": "TT200",
+    "code": "621",
+    "name": "Chi phí nguyên liệu, vật liệu trực tiếp",
+    "name_en": "Direct raw materials cost",
+    "type_id": 5,
+    "type_name": "Chi phí SXKD",
+    "search_text": "621 - Chi phí nguyên liệu, vật liệu trực tiếp (Direct raw materials cost)"
+  },
+  {
+    "standard": "TT200",
+    "code": "622",
+    "name": "Chi phí nhân công trực tiếp",
+    "name_en": "Direct labor cost",
+    "type_id": 5,
+    "type_name": "Chi phí SXKD",
+    "search_text": "622 - Chi phí nhân công trực tiếp (Direct labor cost)"
+  },
+  {
+    "standard": "TT200",
+    "code": "627",
+    "name": "Chi phí sản xuất chung",
+    "name_en": "General operation cost",
+    "type_id": 5,
+    "type_name": "Chi phí SXKD",
+    "search_text": "627 - Chi phí sản xuất chung (General operation cost)"
+  },
+  {
+    "standard": "TT200",
+    "code": "632",
+    "name": "Giá vốn hàng bán",
+    "name_en": "Cost of goods sold",
+    "type_id": 5,
+    "type_name": "Chi phí SXKD",
+    "search_text": "632 - Giá vốn hàng bán (Cost of goods sold)"
+  },
+  {
+    "standard": "TT200",
+    "code": "635",
+    "name": "Chi phí tài chính",
+    "name_en": "Financial activities expenses",
+    "type_id": 5,
+    "type_name": "Chi phí SXKD",
+    "search_text": "635 - Chi phí tài chính (Financial activities expenses)"
+  },
+  {
+    "standard": "TT200",
+    "code": "641",
+    "name": "Chi phí bán hàng",
+    "name_en": "Selling expenses",
+    "type_id": 5,
+    "type_name": "Chi phí SXKD",
+    "search_text": "641 - Chi phí bán hàng (Selling expenses)"
+  },
+  {
+    "standard": "TT200",
+    "code": "642",
+    "name": "Chi phí quản lý doanh nghiệp",
+    "name_en": "General & administration expenses",
+    "type_id": 5,
+    "type_name": "Chi phí SXKD",
+    "search_text": "642 - Chi phí quản lý doanh nghiệp (General & administration expenses)"
+  },
+  {
+    "standard": "TT200",
+    "code": "711",
+    "name": "Thu nhập khác",
+    "name_en": "Other income",
+    "type_id": 6,
+    "type_name": "Thu nhập khác",
+    "search_text": "711 - Thu nhập khác (Other income)"
+  },
+  {
+    "standard": "TT200",
+    "code": "811",
+    "name": "Chi phí khác",
+    "name_en": "Other expenses",
+    "type_id": 7,
+    "type_name": "Chi phí khác",
+    "search_text": "811 - Chi phí khác (Other expenses)"
+  },
+  {
+    "standard": "TT200",
+    "code": "911",
+    "name": "Xác định kết quả kinh doanh",
+    "name_en": "Evaluation of business results",
+    "type_id": 8,
+    "type_name": "Xác định kết quả",
+    "search_text": "911 - Xác định kết quả kinh doanh (Evaluation of business results)"
+  }
+]
